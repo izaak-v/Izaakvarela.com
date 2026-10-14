@@ -1,10 +1,10 @@
 import type { MetadataRoute } from "next";
-import { site } from "./site";
+import { profile } from "@/content/profile";
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  return ["", "/privacy", "/terms"].map((path) => ({
-    url: `${site.url}${path}`,
-    changeFrequency: "yearly",
-    priority: path === "" ? 1 : 0.3,
+  return ["", "/credentials", "/schedule", "/contact", "/privacy", "/terms"].map((path) => ({
+    url: `${profile.website}${path}`,
+    changeFrequency: "monthly",
+    priority: path === "" ? 1 : path === "/credentials" ? 0.8 : 0.5,
   }));
 }

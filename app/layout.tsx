@@ -1,76 +1,59 @@
 import type { Metadata, Viewport } from "next";
-import Link from "next/link";
-import { site } from "./site";
+import { Fraunces, Inter } from "next/font/google";
+import { Header } from "@/components/Header";
+import { Footer } from "@/components/Footer";
+import { profile } from "@/content/profile";
+import { siteDescription, siteTitle } from "@/lib/metadata";
 import "./globals.css";
 
+const serif = Fraunces({
+  subsets: ["latin"],
+  variable: "--font-serif",
+  display: "swap",
+  axes: ["opsz"],
+});
+const sans = Inter({ subsets: ["latin"], variable: "--font-sans", display: "swap" });
+
 export const metadata: Metadata = {
-  metadataBase: new URL(site.url),
-  title: site.title,
-  description: site.description,
+  metadataBase: new URL(profile.website),
+  title: siteTitle,
+  description: siteDescription,
+  applicationName: profile.name,
+  authors: [{ name: profile.name, url: profile.website }],
+  creator: profile.name,
   alternates: { canonical: "/" },
   openGraph: {
-    title: site.title,
-    description: site.description,
-    url: site.url,
-    siteName: site.name,
-    type: "website",
+    title: siteTitle,
+    description: siteDescription,
+    url: "/",
+    siteName: `${profile.name} — ${profile.title}`,
+    type: "profile",
     locale: "en_US",
   },
-  twitter: { card: "summary", title: site.title, description: site.description },
+  twitter: { card: "summary_large_image", title: siteTitle, description: siteDescription },
   robots: { index: true, follow: true },
+  formatDetection: { telephone: false },
 };
 
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
-  themeColor: [
-    { media: "(prefers-color-scheme: light)", color: "#f7f6f3" },
-    { media: "(prefers-color-scheme: dark)", color: "#14171a" },
-  ],
+  viewportFit: "cover",
+  themeColor: "#0f3326",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
-  const year = new Date().getFullYear();
   return (
-    <html lang="en">
+    <html lang="en" className={`${serif.variable} ${sans.variable}`}>
       <body>
         <a className="skip-link" href="#main">
           Skip to content
         </a>
-        <header className="site-header">
-          <div className="container header-inner">
-            <Link href="/" className="brand">
-              <span className="brand-name">{site.name}</span>
-              <span className="brand-role">{site.role}</span>
-            </Link>
-            <nav aria-label="Primary">
-              <ul className="nav-list">
-                <li><Link href="/#services">Services</Link></li>
-                <li><Link href="/#about">About</Link></li>
-                <li><Link href="/#contact">Contact</Link></li>
-              </ul>
-            </nav>
-          </div>
-        </header>
-        <main id="main">{children}</main>
-        <footer className="site-footer">
-          <div className="container footer-inner">
-            <div>
-              <p className="footer-name">{site.name}</p>
-              <p className="footer-role">{site.role}</p>
-            </div>
-            <nav aria-label="Legal">
-              <ul className="footer-links">
-                <li><Link href="/privacy">Privacy Policy</Link></li>
-                <li><Link href="/terms">Terms of Use</Link></li>
-                <li><a href={`mailto:${site.email}`}>{site.email}</a></li>
-              </ul>
-            </nav>
-            <p className="footer-copy">
-              &copy; {year} {site.name}. All rights reserved.
-            </p>
-          </div>
-        </footer>
+        <Header name={profile.name} title={profile.title} />
+        <main id="main" tabIndex={-1}>
+          {children}
+        </main>
+        <Footer />
       </body>
     </html>
   );
