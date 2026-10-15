@@ -74,12 +74,34 @@ test.describe("site content", () => {
     }
   });
 
-  test("schedule page offers Google booking", async ({ page }) => {
+  test("schedule page embeds Google booking with the external fallback", async ({ page }) => {
+    const EMBED =
+      "https://calendar.google.com/calendar/appointments/schedules/AcZssZ1Xss6yM8JYxknHCLrczI9S6x4JeFk6Q1Gs96aUbUMGp_1rMO1r7h7ZdQfb69KDG6u_hjqJbmL9?gv=true";
+    // Google isn't reachable from CI; stand in a tiny page so the iframe "loads".
+    await page.route("https://calendar.google.com/**", (r) =>
+      r.fulfill({ contentType: "text/html", body: "<!doctype html><title>Booking</title>" }),
+    );
     await page.goto("/schedule");
+
+    const frame = page.locator(".booking-frame iframe");
+    await expect(frame).toHaveAttribute("src", EMBED);
+    await expect(frame).toHaveAttribute("title", /Book an appointment with Izaak Varela/);
+    await expect(page.locator(".booking-loading")).toBeHidden();
+
+    const vp = page.viewportSize()!;
+    const box = (await frame.boundingBox())!;
+    expect(box.width).toBeLessThanOrEqual(vp.width);
+    expect(box.height).toBeGreaterThanOrEqual(640);
+
     await expect(page.getByRole("link", { name: /Open Booking Page/ })).toHaveAttribute(
       "href",
       "https://calendar.app.google/aEjZtfNMAWdBLpKJA",
     );
+    const { sw, cw } = await page.evaluate(() => ({
+      sw: document.documentElement.scrollWidth,
+      cw: document.documentElement.clientWidth,
+    }));
+    expect(sw).toBeLessThanOrEqual(cw);
   });
 
   test("structured data identifies the agent", async ({ page }) => {
