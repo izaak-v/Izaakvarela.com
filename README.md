@@ -34,13 +34,12 @@ Submissions are emailed to `izaak@izaakvarela.com` through [Resend](https://rese
 Nothing is stored. Until it's configured, the form keeps the visitor's message and offers an
 "Open in my email app" button pre-filled with it.
 
-Set in Vercel → Project → Settings → Environment Variables (Production), then redeploy:
+Emails are sent from `Izaak Varela Website <website@izaakvarela.com>` (the Resend-verified
+domain) to `izaak@izaakvarela.com`, with the visitor's address as Reply-To — see
+`lib/contact-email.ts`.
 
-- `RESEND_API_KEY` (required) — server-only; never sent to the browser
-- `CONTACT_TO_EMAIL` (optional; defaults to the email in `content/profile.ts`)
-- `CONTACT_FROM_EMAIL` (optional; defaults to `onboarding@resend.dev`, which only delivers to the
-  email address on your Resend account. Verify `izaakvarela.com` in Resend to send from e.g.
-  `Website <website@izaakvarela.com>`.)
+The only setting needed in Vercel → Project → Settings → Environment Variables (Production) is
+`RESEND_API_KEY` — server-only; never sent to the browser.
 
 ## Develop
 

@@ -1,15 +1,14 @@
 import { NextResponse } from "next/server";
 import { profile } from "@/content/profile";
-import { contactSubject, formatContactEmail, validateContact } from "@/lib/contact";
+import { validateContact } from "@/lib/contact";
+import { buildContactEmail } from "@/lib/contact-email";
 
 /**
  * Contact form handler. Emails each submission to your inbox via Resend (https://resend.com).
  * Nothing is stored. Runs only on the server — RESEND_API_KEY never reaches the browser.
  *
- * Environment variables (Vercel → Project → Settings → Environment Variables):
- *   RESEND_API_KEY      required to enable direct delivery
- *   CONTACT_TO_EMAIL    optional, defaults to profile.email (izaak@izaakvarela.com)
- *   CONTACT_FROM_EMAIL  optional, defaults to "Izaakvarela.com <onboarding@resend.dev>"
+ * Sender, recipient, and Reply-To are set in lib/contact-email.ts.
+ * Only environment variable: RESEND_API_KEY (Vercel → Project → Settings → Environment Variables).
  */
 
 const GENERIC_FAILURE = `Sorry, your message couldn't be sent right now. Please try again, or email ${profile.email} directly.`;
@@ -69,13 +68,7 @@ export async function POST(request: Request) {
     const res = await fetch("https://api.resend.com/emails", {
       method: "POST",
       headers: { Authorization: `Bearer ${apiKey}`, "Content-Type": "application/json" },
-      body: JSON.stringify({
-        from: process.env.CONTACT_FROM_EMAIL || "Izaakvarela.com <onboarding@resend.dev>",
-        to: [process.env.CONTACT_TO_EMAIL || profile.email],
-        reply_to: d.email,
-        subject: contactSubject(d),
-        text: formatContactEmail(d),
-      }),
+      body: JSON.stringify(buildContactEmail(d)),
       signal: AbortSignal.timeout(10000),
     });
     if (!res.ok) {
