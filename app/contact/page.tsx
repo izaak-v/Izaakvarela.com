@@ -12,7 +12,6 @@ export const metadata = pageMetadata({
 });
 
 export default function ContactPage() {
-  const serverEnabled = Boolean(process.env.RESEND_API_KEY);
   const { phone, email } = profile;
   return (
     <>
@@ -66,7 +65,7 @@ export default function ContactPage() {
           </aside>
           <div className="form-card">
             <h2 className="h3">Send a message</h2>
-            <ContactForm email={email} name={profile.name} serverEnabled={serverEnabled} />
+            <ContactForm email={email} name={profile.name} phone={phone} />
           </div>
         </div>
       </section>

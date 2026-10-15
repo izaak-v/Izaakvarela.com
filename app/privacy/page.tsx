@@ -31,20 +31,21 @@ export default function Privacy() {
           <li>
             <strong>Contact form.</strong> If you use the contact form, I receive the information
             you enter: first and last name, email address, and, if you choose, phone number, state,
-            the topic you&rsquo;re interested in, and your message. The form is delivered to my
-            email inbox through an email delivery provider (or, in some cases, opens your own email
-            app so you send it yourself). This website does not store form submissions in a
-            database.
+            the topic you&rsquo;re interested in, and your message. The submission is delivered to
+            my email inbox through Resend, an email delivery service. (If online delivery is
+            unavailable, the form instead opens your own email app so you can send it yourself.)
+            This website does not store form submissions in a database.
           </li>
           <li>
-            <strong>Email.</strong> If you email me, I receive your email address and anything you
-            include in your message.
+            <strong>Phone and email.</strong> If you call or email me, I receive your phone number
+            or email address and whatever you choose to share in the conversation or message.
           </li>
           <li>
-            <strong>Scheduling.</strong> Appointments are booked through Google Calendar appointment
-            scheduling. When you book, Google collects the details you enter (such as your name and
-            email) and shares them with me so I can hold the appointment. Google&rsquo;s use of that
-            information is governed by Google&rsquo;s privacy policy.
+            <strong>Scheduling.</strong> Online appointments are booked through Google Calendar
+            appointment scheduling, on a booking page hosted by Google. When you book, Google
+            collects the details you enter (such as your name, email address, and any notes) and
+            shares them with me so I can hold the appointment. Google&rsquo;s handling of that
+            information is governed by Google&rsquo;s own privacy policy.
           </li>
         </ul>
         <p>
@@ -56,8 +57,15 @@ export default function Privacy() {
         <p>
           This website is hosted by Vercel. Like most web hosts, Vercel automatically processes
           basic technical information such as IP address, browser type, and the pages requested, in
-          order to deliver the site and protect it from abuse. This website does not use advertising
-          cookies, analytics trackers, or social media pixels.
+          order to deliver the site and protect it from abuse. This website does not use cookies,
+          analytics, advertising trackers, or social media pixels.
+        </p>
+
+        <h2>Links to other websites</h2>
+        <p>
+          This website links to other sites, such as the National Insurance Producer Registry (NIPR)
+          for license verification and Google for appointment booking. Those sites are operated
+          independently and are governed by their own privacy policies.
         </p>
 
         <h2>How I use information</h2>
@@ -92,9 +100,9 @@ export default function Privacy() {
             coverage.
           </li>
           <li>
-            With service providers that help me operate this website and communicate with you (for
-            example, website hosting, email, and calendar services), only as needed for those
-            services.
+            With service providers that help me operate this website and communicate with you
+            (website hosting by Vercel, email delivery by Resend, and appointment scheduling by
+            Google), only as needed for those services.
           </li>
           <li>When required by law or to protect rights and safety.</li>
         </ul>

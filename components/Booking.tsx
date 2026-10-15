@@ -2,6 +2,7 @@ import { profile } from "@/content/profile";
 import { mailto } from "@/lib/format";
 import { DevPlaceholder } from "./DevPlaceholder";
 import { Icon } from "./Icon";
+import { BookingEmbed } from "./BookingEmbed";
 
 /**
  * Online booking through Google Calendar appointment scheduling.
@@ -35,6 +36,43 @@ export function Booking() {
     );
   }
 
+  const openButton = (
+    <a
+      className="button button-gold button-lg"
+      href={bookingUrl}
+      target="_blank"
+      rel="noopener noreferrer"
+    >
+      <Icon name="calendar" size={18} /> Open Booking Page
+      <span className="sr-only"> (Google Calendar, opens in a new tab)</span>
+    </a>
+  );
+  const phoneLine = phone ? (
+    <p className="booking-alt">
+      Prefer to book by phone? Call <a href={`tel:${phone.tel}`}>{phone.display}</a>.
+    </p>
+  ) : null;
+
+  if (bookingEmbedUrl) {
+    return (
+      <div className="booking">
+        <BookingEmbed
+          src={bookingEmbedUrl}
+          fallbackUrl={bookingUrl}
+          title={`Book an appointment with ${profile.name} (Google Calendar)`}
+        />
+        <div className="booking-card booking-compact">
+          <p>
+            You can also open my booking page directly in Google Calendar. You&rsquo;ll get a
+            confirmation email from Google either way.
+          </p>
+          {openButton}
+          {phoneLine}
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="booking">
       <div className="booking-card booking-primary">
@@ -46,37 +84,14 @@ export function Booking() {
           Choose a day and time that works for you on my Google Calendar booking page. You&rsquo;ll
           get a confirmation email from Google with the details.
         </p>
-        <a
-          className="button button-gold button-lg"
-          href={bookingUrl}
-          target="_blank"
-          rel="noopener"
-        >
-          <Icon name="calendar" size={18} /> Open Booking Page
-          <span className="sr-only"> (Google Calendar, opens in a new tab)</span>
-        </a>
-        {phone ? (
-          <p className="booking-alt">
-            Prefer to book by phone? Call <a href={`tel:${phone.tel}`}>{phone.display}</a>.
-          </p>
-        ) : null}
+        {openButton}
+        {phoneLine}
       </div>
-
-      {bookingEmbedUrl ? (
-        <div className="booking-frame">
-          <iframe
-            src={bookingEmbedUrl}
-            title={`Book an appointment with ${profile.name} (Google Calendar)`}
-            loading="lazy"
-          />
-        </div>
-      ) : (
-        <DevPlaceholder title="inline calendar not enabled">
-          Optional: paste the Google &ldquo;Website embed → Inline&rdquo; iframe <code>src</code>{" "}
-          into <code>bookingEmbedUrl</code> in <code>content/profile.ts</code> to show the calendar
-          on this page. The Open Booking Page button works without it.
-        </DevPlaceholder>
-      )}
+      <DevPlaceholder title="inline calendar not enabled">
+        Optional: paste the Google &ldquo;Website embed → Inline&rdquo; iframe <code>src</code> into{" "}
+        <code>bookingEmbedUrl</code> in <code>content/profile.ts</code> to show the calendar on this
+        page. The Open Booking Page button works without it.
+      </DevPlaceholder>
     </div>
   );
 }

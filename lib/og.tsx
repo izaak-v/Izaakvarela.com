@@ -7,7 +7,7 @@ import { profile } from "@/content/profile";
 export const ogSize = { width: 1200, height: 630 };
 
 /** Branded share card used for link previews (texts, email, social). */
-export async function renderOgImage(opts: { eyebrow?: string; lines: string[] }) {
+export async function renderOgImage(opts: { eyebrow?: string; lines: string[]; pill?: string }) {
   const photo = profile.photo
     ? `data:image/jpeg;base64,${(await readFile(join(process.cwd(), "public", profile.photo.src))).toString("base64")}`
     : null;
@@ -67,6 +67,24 @@ export async function renderOgImage(opts: { eyebrow?: string; lines: string[] })
             {line}
           </div>
         ))}
+        {opts.pill ? (
+          <div
+            style={{
+              display: "flex",
+              alignSelf: "flex-start",
+              marginTop: 32,
+              padding: "16px 30px",
+              borderRadius: 999,
+              background: "#c9a564",
+              color: "#0b261c",
+              fontSize: 28,
+              fontWeight: 700,
+              fontFamily: "sans-serif",
+            }}
+          >
+            {opts.pill}
+          </div>
+        ) : null}
       </div>
     </div>,
     ogSize,

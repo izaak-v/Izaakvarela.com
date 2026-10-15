@@ -80,13 +80,23 @@ const LIMITS: Record<keyof ContactPayload, number> = {
   message: 3000,
 };
 
+const MULTILINE: (keyof ContactPayload)[] = ["message"];
+
+/** Strip control characters (and line breaks from single-line fields, so they can't alter email headers). */
+function clean(key: keyof ContactPayload, value: string): string {
+  if (MULTILINE.includes(key)) {
+    return value.replace(/\r\n?/g, "\n").replace(/[\u0000-\u0009\u000B-\u001F\u007F]/g, "");
+  }
+  return value.replace(/[\u0000-\u001F\u007F]+/g, " ").replace(/\s{2,}/g, " ");
+}
+
 /** Returns a cleaned payload, or an error message. Used on both client and server. */
 export function validateContact(
   input: Record<string, unknown>,
 ): { ok: true; data: ContactPayload } | { ok: false; error: string } {
   const data = {} as ContactPayload;
   for (const key of Object.keys(LIMITS) as (keyof ContactPayload)[]) {
-    const raw = typeof input[key] === "string" ? (input[key] as string).trim() : "";
+    const raw = typeof input[key] === "string" ? clean(key, input[key] as string).trim() : "";
     if (raw.length > LIMITS[key]) return { ok: false, error: `${key} is too long.` };
     data[key] = raw;
   }
@@ -103,14 +113,25 @@ export function validateContact(
   return { ok: true, data };
 }
 
+export function contactSubject(d: ContactPayload): string {
+  return `Website Inquiry — ${d.firstName} ${d.lastName}`;
+}
+
 export function formatContactEmail(d: ContactPayload): string {
   return [
-    `Name: ${d.firstName} ${d.lastName}`,
-    `Email: ${d.email}`,
-    `Phone: ${d.phone || "—"}`,
-    `State: ${d.state || "—"}`,
-    `Topic: ${d.topic || "—"}`,
+    "New inquiry from izaakvarela.com",
     "",
+    `First name:  ${d.firstName}`,
+    `Last name:   ${d.lastName}`,
+    `Email:       ${d.email}`,
+    `Phone:       ${d.phone || "(not provided)"}`,
+    `State:       ${d.state || "(not provided)"}`,
+    `Topic:       ${d.topic || "(not selected)"}`,
+    "",
+    "Message:",
     d.message,
+    "",
+    "—",
+    "Reply to this email to respond directly to the sender.",
   ].join("\n");
 }

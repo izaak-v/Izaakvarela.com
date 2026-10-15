@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { faqs } from "@/content/faqs";
 
 export function Faq() {
@@ -9,6 +10,13 @@ export function Faq() {
             <span>{f.question}</span>
           </summary>
           <p>{f.answer}</p>
+          {f.link ? (
+            <p className="faq-link">
+              <Link className="text-link" href={f.link.href}>
+                {f.link.label} →
+              </Link>
+            </p>
+          ) : null}
         </details>
       ))}
     </div>

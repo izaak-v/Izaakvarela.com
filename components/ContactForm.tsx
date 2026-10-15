@@ -1,57 +1,108 @@
 "use client";
 
-import { useState } from "react";
-import { TOPICS, US_STATES, formatContactEmail, validateContact } from "@/lib/contact";
+import Link from "next/link";
+import { useRef, useState } from "react";
+import {
+  TOPICS,
+  US_STATES,
+  contactSubject,
+  formatContactEmail,
+  validateContact,
+  type ContactPayload,
+} from "@/lib/contact";
+import { Icon } from "./Icon";
 
 type Props = {
   email: string;
   name: string;
-  /** true when the server can send email (RESEND_API_KEY set); otherwise opens the visitor's email app. */
-  serverEnabled: boolean;
+  phone: { display: string; tel: string } | null;
 };
 
-type Status = { kind: "idle" | "sending" | "sent" | "error"; message?: string };
+type Status =
+  | { kind: "idle" }
+  | { kind: "sending" }
+  | { kind: "sent" }
+  /** Online delivery isn't configured: offer the visitor's email app, pre-filled. */
+  | { kind: "fallback"; mailtoHref: string }
+  | { kind: "error"; message: string };
 
-export function ContactForm({ email, name, serverEnabled }: Props) {
+function mailtoFor(email: string, d: ContactPayload): string {
+  return `mailto:${email}?subject=${encodeURIComponent(contactSubject(d))}&body=${encodeURIComponent(formatContactEmail(d))}`;
+}
+
+export function ContactForm({ email, name, phone }: Props) {
   const [status, setStatus] = useState<Status>({ kind: "idle" });
+  const inFlight = useRef(false);
 
   async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    const form = e.currentTarget;
-    const values = Object.fromEntries(new FormData(form)) as Record<string, string>;
+    if (inFlight.current) return; // guard against double taps / duplicate submissions
+    const values = Object.fromEntries(new FormData(e.currentTarget)) as Record<string, string>;
     const result = validateContact(values);
     if (!result.ok) {
       setStatus({ kind: "error", message: result.error });
       return;
     }
 
-    if (!serverEnabled) {
-      const subject = `Website inquiry from ${result.data.firstName} ${result.data.lastName}`;
-      window.location.href = `mailto:${email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(formatContactEmail(result.data))}`;
-      setStatus({
-        kind: "sent",
-        message: "Your email app should open with your message ready to send. Just press Send.",
-      });
-      return;
-    }
-
+    inFlight.current = true;
     setStatus({ kind: "sending" });
     try {
       const res = await fetch("/api/contact", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ ...result.data, company: values.company ?? "" }),
+        signal: AbortSignal.timeout(20000),
       });
-      const json = await res.json().catch(() => ({}));
-      if (!res.ok) throw new Error(json.error || `Please email ${email} directly.`);
-      form.reset();
+      const json = (await res.json().catch(() => ({}))) as { error?: string };
+      if (res.status === 503) {
+        setStatus({ kind: "fallback", mailtoHref: mailtoFor(email, result.data) });
+        return;
+      }
+      if (!res.ok) {
+        setStatus({
+          kind: "error",
+          message:
+            json.error || `Sorry, your message couldn't be sent. Please email ${email} directly.`,
+        });
+        return;
+      }
+      setStatus({ kind: "sent" });
+    } catch {
       setStatus({
-        kind: "sent",
-        message: `Thank you — your message was sent. ${name} will reply by email.`,
+        kind: "error",
+        message: `The connection timed out or dropped. Your message is still here — please try again, or email ${email} directly.`,
       });
-    } catch (err) {
-      setStatus({ kind: "error", message: (err as Error).message });
+    } finally {
+      inFlight.current = false;
     }
+  }
+
+  if (status.kind === "sent") {
+    return (
+      <div
+        className="form-success"
+        role="status"
+        aria-live="polite"
+        tabIndex={-1}
+        ref={(el) => el?.focus()}
+      >
+        <span className="form-success-icon" aria-hidden="true">
+          <Icon name="check" size={28} />
+        </span>
+        <h3>Thanks — your message has been sent.</h3>
+        <p>I&rsquo;ll get back to you as soon as I can.</p>
+        <div className="button-row">
+          <Link className="button button-gold" href="/schedule">
+            <Icon name="calendar" size={18} /> Schedule a Consultation
+          </Link>
+          {phone ? (
+            <a className="button button-ghost" href={`tel:${phone.tel}`}>
+              <Icon name="phone" size={18} /> Call Me
+            </a>
+          ) : null}
+        </div>
+      </div>
+    );
   }
 
   return (
@@ -136,21 +187,37 @@ export function ContactForm({ email, name, serverEnabled }: Props) {
       </p>
 
       <div className="form-actions">
-        <button className="button" type="submit" disabled={status.kind === "sending"}>
+        <button
+          className="button"
+          type="submit"
+          disabled={status.kind === "sending"}
+          aria-disabled={status.kind === "sending"}
+        >
           {status.kind === "sending" ? "Sending…" : "Send message"}
         </button>
-        {!serverEnabled ? (
-          <span className="hint">This opens your email app with your message filled in.</span>
-        ) : null}
       </div>
 
-      <p
-        className={`form-status ${status.kind}`}
-        role={status.kind === "error" ? "alert" : "status"}
-        aria-live="polite"
-      >
-        {status.message}
-      </p>
+      <div className={`form-status ${status.kind}`} role="status" aria-live="polite">
+        {status.kind === "error" ? <p role="alert">{status.message}</p> : null}
+        {status.kind === "fallback" ? (
+          <div className="form-fallback">
+            <p>
+              Online sending isn&rsquo;t available at the moment, but your message is still in the
+              form. You can send it from your own email app instead
+              {phone ? (
+                <>
+                  {" "}
+                  or call <a href={`tel:${phone.tel}`}>{phone.display}</a>
+                </>
+              ) : null}
+              .
+            </p>
+            <a className="button button-gold" href={status.mailtoHref}>
+              <Icon name="mail" size={18} /> Open in my email app
+            </a>
+          </div>
+        ) : null}
+      </div>
     </form>
   );
 }

@@ -8,7 +8,6 @@ import { Testimonials } from "@/components/Testimonials";
 import { Faq } from "@/components/Faq";
 import { Icon, type IconName } from "@/components/Icon";
 import { personJsonLd } from "@/lib/structured-data";
-import { mailto } from "@/lib/format";
 
 const serviceIcons: Record<string, IconName> = {
   "life-insurance": "shield",
@@ -185,11 +184,7 @@ export default function Home() {
         <div className="container">
           <div className="section-head">
             <p className="eyebrow">Licensing &amp; Credentials</p>
-            <h2 id="licensing-title">Credentials you can check yourself</h2>
-            <p className="section-intro">
-              You shouldn&rsquo;t have to take anyone&rsquo;s word for it. Here&rsquo;s how to
-              confirm I&rsquo;m a licensed insurance producer before we ever talk numbers.
-            </p>
+            <h2 id="licensing-title">Check my license before we talk</h2>
           </div>
           <NiprVerify />
           <LicenseList />
@@ -219,11 +214,6 @@ export default function Home() {
               </li>
             ))}
           </ol>
-          <div className="center">
-            <Link className="button button-gold" href="/schedule">
-              <Icon name="calendar" size={18} /> Schedule a Consultation
-            </Link>
-          </div>
         </div>
       </section>
 
@@ -235,8 +225,8 @@ export default function Home() {
               <p className="eyebrow">Appointments</p>
               <h2 id="booking-title">Book a time that works for you</h2>
               <p className="section-intro">
-                Pick an open slot on my calendar — consultations are free, and you can reschedule
-                from your confirmation email. Prefer to talk first? Give me a call.
+                Pick an open time on my calendar. Consultations are free, and you&rsquo;ll get a
+                confirmation by email. Prefer to talk first? Give me a call.
               </p>
             </div>
             <div className="booking-cta-actions">
@@ -308,13 +298,13 @@ export default function Home() {
               </li>
             ) : null}
             <li>
-              <a className="cta-tile" href={mailto(profile.email)}>
+              <Link className="cta-tile" href="/contact">
                 <Icon name="mail" size={22} />
                 <span>
-                  <strong>Email</strong>
-                  <small>{profile.email}</small>
+                  <strong>Contact</strong>
+                  <small>Email or send a message</small>
                 </span>
-              </a>
+              </Link>
             </li>
           </ul>
         </div>
