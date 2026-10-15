@@ -2,17 +2,17 @@ export type Faq = { question: string; answer: string };
 
 export const faqs: Faq[] = [
   {
-    question: "What does a life insurance consultation cost?",
+    question: "What does a consultation cost?",
     answer:
       "There is no fee for a consultation. We talk through your situation and the options that may be available, and there is no obligation to apply for or purchase anything.",
   },
   {
     question: "What information should I have ready?",
     answer:
-      "It helps to have a general sense of your goals, who you want to protect, any existing life insurance, and rough figures for things like your mortgage or other debts. Please don't send sensitive details such as Social Security numbers, bank information, or medical records through this website or by email.",
+      "It helps to have a general sense of your goals, who you want to protect, any existing life insurance (including coverage through work), and rough figures for things like your mortgage, other debts, and monthly budget. Please don't send sensitive details such as Social Security numbers, bank information, or medical records through this website or by email.",
   },
   {
-    question: "Can you help me compare different types of coverage?",
+    question: "Can you help compare different types of coverage?",
     answer:
       "Yes. I can explain how term, permanent, and final expense coverage generally differ, and walk through how each may line up with your goals. Availability, pricing, and features depend on the insurance company and on underwriting.",
   },
@@ -32,13 +32,13 @@ export const faqs: Faq[] = [
       "Living benefits are features or riders on some life insurance policies that may allow access to part of the death benefit while you are alive if you experience a qualifying chronic, critical, or terminal illness. Whether they are available, and how they work, depends on the specific policy.",
   },
   {
-    question: "How do I verify your insurance license?",
+    question: "How can I verify your license?",
     answer:
-      "Insurance licenses are issued by each state. The Licensing & Credentials section and the Credentials page list my license details with links to the official state lookup, so you can confirm my license independently.",
+      "Insurance licenses are issued and regulated by each state. My credentials can be independently verified through the National Insurance Producer Registry (NIPR) using my National Producer Number (NPN) — the Credentials page has the number and a direct link. You can also check with your state's Department of Insurance.",
   },
   {
     question: "How do I schedule a follow-up?",
     answer:
-      "You can book another time from the Schedule page or simply reply to any email from me at izaak@izaakvarela.com.",
+      "Book another time from the Schedule page, call me at (928) 581-1704, or reply to any email from me at izaak@izaakvarela.com. You can also reschedule from the confirmation email you receive when you book online.",
   },
 ];

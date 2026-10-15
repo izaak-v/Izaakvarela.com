@@ -9,35 +9,34 @@ export function personJsonLd() {
     "@id": `${profile.website}/#person`,
     name: profile.name,
     jobTitle: profile.title,
+    description: `${profile.name} is a licensed life insurance agent (${profile.legalName}).`,
     url: profile.website,
     email: `mailto:${profile.email}`,
     ...(profile.phone ? { telephone: profile.phone.tel } : {}),
     ...(profile.photo ? { image: `${profile.website}${profile.photo.src}` } : {}),
     ...(profile.socialLinks.length ? { sameAs: profile.socialLinks.map((s) => s.href) } : {}),
-    hasOccupation: {
-      "@type": "Occupation",
-      name: profile.title,
-      ...(active.length
-        ? {
-            occupationLocation: active.map((l) => ({
-              "@type": "State",
-              name: l.state,
-            })),
-          }
-        : {}),
+    identifier: {
+      "@type": "PropertyValue",
+      propertyID: "National Producer Number (NPN)",
+      value: profile.npn,
     },
-    hasCredential: active.map((l) => ({
-      "@type": "EducationalOccupationalCredential",
-      credentialCategory: "license",
-      name: `${l.state} ${l.licenseType ?? "Insurance"} License`,
-      identifier: l.licenseNumber,
-      ...(l.expirationDate ? { expires: l.expirationDate } : {}),
-      recognizedBy: { "@type": "Organization", name: `${l.state} insurance regulator` },
-    })),
+    hasOccupation: { "@type": "Occupation", name: profile.title },
+    ...(active.length
+      ? {
+          hasCredential: active.map((l) => ({
+            "@type": "EducationalOccupationalCredential",
+            credentialCategory: "license",
+            name: `${l.state} ${l.licenseType ?? "Insurance"} License`,
+            identifier: l.licenseNumber,
+            ...(l.expirationDate ? { expires: l.expirationDate } : {}),
+          })),
+        }
+      : {}),
     knowsAbout: [
       "Life insurance",
       "Final expense insurance",
       "Mortgage protection",
+      "Family protection",
       "Living benefits",
     ],
     contactPoint: {
@@ -45,6 +44,7 @@ export function personJsonLd() {
       contactType: "customer service",
       email: profile.email,
       ...(profile.phone ? { telephone: profile.phone.tel } : {}),
+      availableLanguage: "English",
     },
   };
 }

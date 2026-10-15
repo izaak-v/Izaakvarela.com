@@ -119,8 +119,8 @@ export function ContactForm({ email, name, serverEnabled }: Props) {
             aria-describedby="message-hint"
           />
           <p id="message-hint" className="hint">
-            Please don&rsquo;t include Social Security numbers, bank or payment details, or medical
-            information.
+            Please don&rsquo;t include sensitive information: Social Security numbers, bank account
+            or routing numbers, payment card details, or detailed medical information.
           </p>
         </div>
         <div className="hp" aria-hidden="true">

@@ -1,16 +1,10 @@
 import { licenses } from "@/content/licenses";
 import { formatDate } from "@/lib/format";
-import { DevPlaceholder } from "./DevPlaceholder";
 import { Icon } from "./Icon";
 
 export function LicenseList() {
-  if (licenses.length === 0) {
-    return (
-      <DevPlaceholder title="no licenses configured">
-        Add your licenses in <code>content/licenses.ts</code>.
-      </DevPlaceholder>
-    );
-  }
+  // Optional section: nothing renders until a confirmed license is added.
+  if (licenses.length === 0) return null;
 
   return (
     <ul className="license-list">

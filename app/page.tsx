@@ -1,9 +1,9 @@
 import Link from "next/link";
 import { profile } from "@/content/profile";
-import { licenses } from "@/content/licenses";
 import { services } from "@/content/services";
 import { Portrait } from "@/components/Portrait";
 import { LicenseList } from "@/components/LicenseList";
+import { NiprVerify } from "@/components/NiprVerify";
 import { Testimonials } from "@/components/Testimonials";
 import { Faq } from "@/components/Faq";
 import { Icon, type IconName } from "@/components/Icon";
@@ -34,7 +34,7 @@ const steps = [
 ];
 
 export default function Home() {
-  const activeStates = licenses.filter((l) => l.status === "active").map((l) => l.state);
+  const { phone } = profile;
 
   return (
     <>
@@ -62,6 +62,14 @@ export default function Home() {
               <Link className="button button-outline-light" href="/credentials">
                 <Icon name="shield" size={18} /> Verify My Credentials
               </Link>
+            </div>
+            <div className="hero-secondary">
+              {phone ? (
+                <a className="text-link-light" href={`tel:${phone.tel}`}>
+                  <Icon name="phone" size={18} /> Call Me
+                  <span className="hero-phone">{phone.display}</span>
+                </a>
+              ) : null}
               <Link className="text-link-light" href="/contact">
                 Contact Me <Icon name="arrow" size={16} />
               </Link>
@@ -86,13 +94,8 @@ export default function Home() {
           <span>
             <Icon name="check" size={18} /> {profile.title}
           </span>
-          {activeStates.length ? (
-            <span>
-              <Icon name="check" size={18} /> Licensed in {activeStates.join(", ")}
-            </span>
-          ) : null}
           <span>
-            <Icon name="check" size={18} /> National Producer Number {profile.npn}
+            <Icon name="check" size={18} /> NPN {profile.npn} · verifiable on NIPR
           </span>
           <span>
             <Icon name="check" size={18} /> Free, no-obligation consultations
@@ -161,13 +164,16 @@ export default function Home() {
             </p>
             <ul className="check-list check-list-lg">
               <li>
-                <Icon name="check" size={18} /> Clear explanations, no jargon
+                <Icon name="check" size={18} /> Understand how life insurance options work
               </li>
               <li>
-                <Icon name="check" size={18} /> Your goals lead the conversation
+                <Icon name="check" size={18} /> Identify what you&rsquo;re trying to protect
               </li>
               <li>
-                <Icon name="check" size={18} /> Credentials you can verify yourself
+                <Icon name="check" size={18} /> Compare coverage options that may fit
+              </li>
+              <li>
+                <Icon name="check" size={18} /> Make an informed decision, on your timeline
               </li>
             </ul>
           </div>
@@ -179,12 +185,13 @@ export default function Home() {
         <div className="container">
           <div className="section-head">
             <p className="eyebrow">Licensing &amp; Credentials</p>
-            <h2 id="licensing-title">Verify my license independently</h2>
+            <h2 id="licensing-title">Credentials you can check yourself</h2>
             <p className="section-intro">
-              Insurance licensing is issued and regulated at the state level. You can independently
-              verify my credentials using the links below.
+              You shouldn&rsquo;t have to take anyone&rsquo;s word for it. Here&rsquo;s how to
+              confirm I&rsquo;m a licensed insurance producer before we ever talk numbers.
             </p>
           </div>
+          <NiprVerify />
           <LicenseList />
           <p className="section-foot">
             <Link className="text-link" href="/credentials">
@@ -220,6 +227,32 @@ export default function Home() {
         </div>
       </section>
 
+      {/* BOOKING CTA */}
+      <section className="section" aria-labelledby="booking-title">
+        <div className="container">
+          <div className="booking-cta">
+            <div>
+              <p className="eyebrow">Appointments</p>
+              <h2 id="booking-title">Book a time that works for you</h2>
+              <p className="section-intro">
+                Pick an open slot on my calendar — consultations are free, and you can reschedule
+                from your confirmation email. Prefer to talk first? Give me a call.
+              </p>
+            </div>
+            <div className="booking-cta-actions">
+              <Link className="button button-gold button-lg" href="/schedule">
+                <Icon name="calendar" size={18} /> Schedule a Consultation
+              </Link>
+              {phone ? (
+                <a className="button button-ghost" href={`tel:${phone.tel}`}>
+                  <Icon name="phone" size={18} /> Call Me
+                </a>
+              ) : null}
+            </div>
+          </div>
+        </div>
+      </section>
+
       <Testimonials />
 
       {/* FAQ */}
@@ -244,21 +277,46 @@ export default function Home() {
         </div>
       </section>
 
-      {/* CTA */}
-      <section className="section cta-band" aria-labelledby="cta-title">
+      {/* FINAL CTA / CONTACT */}
+      <section id="contact" className="section cta-band" aria-labelledby="cta-title">
         <div className="container cta-inner">
           <div>
             <h2 id="cta-title">Ready to talk it through?</h2>
-            <p>Book a free consultation, or reach out with a question first.</p>
+            <p>
+              Book a free consultation, call, or send a quick question first — whatever is easiest.
+            </p>
           </div>
-          <div className="button-row">
-            <Link className="button button-gold" href="/schedule">
-              Schedule a Consultation
-            </Link>
-            <a className="button button-outline-light" href={mailto(profile.email)}>
-              <Icon name="mail" size={18} /> {profile.email}
-            </a>
-          </div>
+          <ul className="cta-contact">
+            <li>
+              <Link className="cta-tile" href="/schedule">
+                <Icon name="calendar" size={22} />
+                <span>
+                  <strong>Schedule</strong>
+                  <small>Book online</small>
+                </span>
+              </Link>
+            </li>
+            {phone ? (
+              <li>
+                <a className="cta-tile" href={`tel:${phone.tel}`}>
+                  <Icon name="phone" size={22} />
+                  <span>
+                    <strong>Call</strong>
+                    <small>{phone.display}</small>
+                  </span>
+                </a>
+              </li>
+            ) : null}
+            <li>
+              <a className="cta-tile" href={mailto(profile.email)}>
+                <Icon name="mail" size={22} />
+                <span>
+                  <strong>Email</strong>
+                  <small>{profile.email}</small>
+                </span>
+              </a>
+            </li>
+          </ul>
         </div>
       </section>
     </>

@@ -7,12 +7,13 @@ import { mailto } from "@/lib/format";
 
 export const metadata = pageMetadata({
   title: "Contact",
-  description: `Contact ${profile.name}, ${profile.title}, with questions about life insurance, final expense, mortgage protection, or living benefits.`,
+  description: `Call, email, or message ${profile.name}, ${profile.title}, about life insurance, final expense, mortgage protection, family protection, or living benefits.`,
   path: "/contact",
 });
 
 export default function ContactPage() {
   const serverEnabled = Boolean(process.env.RESEND_API_KEY);
+  const { phone, email } = profile;
   return (
     <>
       <section className="page-hero" aria-labelledby="contact-title">
@@ -20,8 +21,7 @@ export default function ContactPage() {
           <p className="eyebrow eyebrow-light">Contact</p>
           <h1 id="contact-title">Let&rsquo;s talk</h1>
           <p className="hero-lede">
-            Have a question about coverage, or want to set up a time to review your options? Send a
-            message and I&rsquo;ll get back to you.
+            Call, email, send a message, or book a time — whichever is easiest for you.
           </p>
         </div>
       </section>
@@ -31,30 +31,42 @@ export default function ContactPage() {
           <aside className="contact-card">
             <h2 className="h3">{profile.name}</h2>
             <p className="muted">{profile.title}</p>
-            <ul className="contact-lines">
-              <li>
-                <Icon name="mail" size={20} />
-                <a href={mailto(profile.email)}>{profile.email}</a>
-              </li>
-              {profile.phone ? (
-                <li>
-                  <Icon name="phone" size={20} />
-                  <a href={`tel:${profile.phone.tel}`}>{profile.phone.display}</a>
-                </li>
+            <dl className="contact-details">
+              {phone ? (
+                <div>
+                  <dt>Phone</dt>
+                  <dd>
+                    <a href={`tel:${phone.tel}`}>{phone.display}</a>
+                  </dd>
+                </div>
               ) : null}
-              <li>
-                <Icon name="calendar" size={20} />
-                <Link href="/schedule">Schedule a consultation</Link>
-              </li>
-              <li>
-                <Icon name="shield" size={20} />
-                <Link href="/credentials">Verify my license</Link>
-              </li>
-            </ul>
+              <div>
+                <dt>Email</dt>
+                <dd>
+                  <a href={mailto(email)}>{email}</a>
+                </dd>
+              </div>
+            </dl>
+            <div className="contact-actions">
+              {phone ? (
+                <a className="button" href={`tel:${phone.tel}`}>
+                  <Icon name="phone" size={18} /> Call Izaak
+                </a>
+              ) : null}
+              <a className="button button-ghost" href={mailto(email)}>
+                <Icon name="mail" size={18} /> Email Izaak
+              </a>
+              <Link className="button button-gold" href="/schedule">
+                <Icon name="calendar" size={18} /> Schedule Consultation
+              </Link>
+            </div>
+            <p className="fine-print">
+              <Link href="/credentials">Verify my credentials</Link> on NIPR before we talk.
+            </p>
           </aside>
           <div className="form-card">
             <h2 className="h3">Send a message</h2>
-            <ContactForm email={profile.email} name={profile.name} serverEnabled={serverEnabled} />
+            <ContactForm email={email} name={profile.name} serverEnabled={serverEnabled} />
           </div>
         </div>
       </section>

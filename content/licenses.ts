@@ -1,7 +1,7 @@
 /**
- * Insurance licenses — one entry per state.
- * Add only licenses you actually hold, copied from your official license record.
- * Every field shown here appears publicly on the home page and /credentials.
+ * State insurance licenses — optional extra detail shown on /credentials and the home page.
+ * Primary verification is NIPR via your NPN (see content/profile.ts).
+ * Every entry here appears publicly.
  */
 
 export type License = {
@@ -24,19 +24,22 @@ export type License = {
   verificationNote?: string;
 };
 
-export const licenses: License[] = [
-  {
-    state: "Arizona",
-    stateCode: "AZ",
-    licenseNumber: "22276637",
-    licenseType: "Insurance Producer",
-    linesOfAuthority: ["Life"],
-    residency: "Resident",
-    status: "active",
-    effectiveDate: "2026-07-03",
-    expirationDate: "2029-10-31",
-    verificationUrl: "https://difi.az.gov/license-search",
-    verificationNote:
-      "Arizona Department of Insurance and Financial Institutions. Search as an individual licensee using license number / NPN 22276637.",
-  },
-];
+/**
+ * Optional, secondary to NIPR verification. Leave empty unless you want a specific state
+ * license shown publicly. Only add states you have confirmed from your official license record.
+ *
+ * Example (from your license printout — uncomment ONLY after confirming the issuing state):
+ * {
+ *   state: "Arizona",
+ *   stateCode: "AZ",
+ *   licenseNumber: "22276637",
+ *   licenseType: "Insurance Producer",
+ *   linesOfAuthority: ["Life"],
+ *   residency: "Resident",
+ *   status: "active",
+ *   effectiveDate: "2026-07-03",
+ *   expirationDate: "2029-10-31",
+ *   verificationUrl: "https://difi.az.gov/license-search",
+ * },
+ */
+export const licenses: License[] = [];

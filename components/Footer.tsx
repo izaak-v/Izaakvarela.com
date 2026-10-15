@@ -1,11 +1,10 @@
 import Link from "next/link";
 import { profile } from "@/content/profile";
-import { licenses } from "@/content/licenses";
 import { mailto } from "@/lib/format";
+import { Icon } from "./Icon";
 
 export function Footer() {
   const year = new Date().getFullYear();
-  const states = licenses.filter((l) => l.status === "active").map((l) => l.state);
 
   return (
     <footer className="site-footer">
@@ -14,10 +13,19 @@ export function Footer() {
           <div className="footer-id">
             <p className="footer-name">{profile.name}</p>
             <p className="footer-role">{profile.title}</p>
-            <p className="footer-meta">
-              NPN {profile.npn}
-              {states.length ? ` · Licensed in ${states.join(", ")}` : ""}
-            </p>
+            <p className="footer-meta">NPN {profile.npn}</p>
+            <ul className="footer-contact">
+              {profile.phone ? (
+                <li>
+                  <Icon name="phone" size={16} />
+                  <a href={`tel:${profile.phone.tel}`}>{profile.phone.display}</a>
+                </li>
+              ) : null}
+              <li>
+                <Icon name="mail" size={16} />
+                <a href={mailto(profile.email)}>{profile.email}</a>
+              </li>
+            </ul>
           </div>
           <nav aria-label="Footer" className="footer-nav">
             <ul>
@@ -36,13 +44,11 @@ export function Footer() {
             </ul>
             <ul>
               <li>
-                <a href={mailto(profile.email)}>{profile.email}</a>
+                <Link href="/privacy">Privacy</Link>
               </li>
-              {profile.phone ? (
-                <li>
-                  <a href={`tel:${profile.phone.tel}`}>{profile.phone.display}</a>
-                </li>
-              ) : null}
+              <li>
+                <Link href="/terms">Terms</Link>
+              </li>
               {profile.socialLinks.map((s) => (
                 <li key={s.href}>
                   <a href={s.href} target="_blank" rel="noopener noreferrer me">
@@ -56,13 +62,14 @@ export function Footer() {
 
         <div className="footer-disclosure">
           <p>
-            <strong>Disclosure.</strong> {profile.name} is a licensed life insurance agent.
-            Insurance products, features, and availability vary by state and insurance company.
-            Approval, coverage, and rates depend on underwriting and carrier requirements.
-            Information on this website is general in nature and is not legal, tax, or financial
-            advice. This website is not affiliated with or endorsed by any government agency.
-            Licensing can be independently verified through the appropriate state Department of
-            Insurance — see <Link href="/credentials">Credentials</Link>.
+            <strong>Disclosure.</strong> {profile.name} is a licensed life insurance agent and an
+            independent sole proprietor. Insurance products, features, and availability vary by
+            state and insurance company. Approval, coverage, and rates depend on underwriting and
+            carrier requirements. Information on this website is general in nature and is not legal,
+            tax, or financial advice. This website is not affiliated with or endorsed by any
+            government agency. Credentials can be independently verified through NIPR or the
+            appropriate state Department of Insurance — see{" "}
+            <Link href="/credentials">Credentials</Link>.
           </p>
         </div>
 

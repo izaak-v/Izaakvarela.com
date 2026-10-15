@@ -9,7 +9,7 @@ export const metadata = pageMetadata({
   path: "/privacy",
 });
 
-const UPDATED = "October 14, 2026";
+const UPDATED = "October 15, 2026";
 
 export default function Privacy() {
   const site = profile.website.replace(/^https?:\/\//, "");

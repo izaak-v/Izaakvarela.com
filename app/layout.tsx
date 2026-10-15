@@ -49,7 +49,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <a className="skip-link" href="#main">
           Skip to content
         </a>
-        <Header name={profile.name} title={profile.title} />
+        <Header name={profile.name} title={profile.title} phone={profile.phone} />
         <main id="main" tabIndex={-1}>
           {children}
         </main>

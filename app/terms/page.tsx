@@ -9,7 +9,7 @@ export const metadata = pageMetadata({
   path: "/terms",
 });
 
-const UPDATED = "October 14, 2026";
+const UPDATED = "October 15, 2026";
 
 export default function Terms() {
   const site = profile.website.replace(/^https?:\/\//, "");
@@ -50,17 +50,17 @@ export default function Terms() {
 
         <h2>Contacting me</h2>
         <p>
-          Submitting the contact form, sending an email, or booking a consultation does not create
-          an obligation for either of us, does not constitute an application for insurance, and does
-          not bind coverage. Please do not send Social Security numbers, bank or payment
+          Calling, submitting the contact form, sending an email, or booking a consultation does not
+          create an obligation for either of us, does not constitute an application for insurance,
+          and does not bind coverage. Please do not send Social Security numbers, bank or payment
           information, or medical information through this website or by email.
         </p>
 
         <h2>Third-party services and links</h2>
         <p>
-          This website links to or embeds third-party services, such as Google Calendar for
-          scheduling and official state license lookup websites. Those services are governed by
-          their own terms and privacy policies, and I am not responsible for their content.
+          This website links to third-party services, such as Google Calendar for scheduling and
+          NIPR or state websites for license lookups. Those services are governed by their own terms
+          and privacy policies, and I am not responsible for their content.
         </p>
 
         <h2>Website content</h2>

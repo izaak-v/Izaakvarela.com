@@ -1,6 +1,6 @@
 /**
  * Business identity and contact details.
- * This is the one place to update name, email, phone, booking link, photo, and social links.
+ * This is the one place to update name, phone, email, NPN, booking link, photo, and social links.
  * Leave a value as `null` until you have the real thing — the site hides it publicly
  * (and shows a labeled placeholder only while running `npm run dev`).
  */
@@ -16,22 +16,37 @@ export const profile = {
   email: "izaak@izaakvarela.com",
 
   /**
-   * Public business phone. `null` = not shown anywhere.
-   * Example: { display: "(555) 555-0100", tel: "+15555550100" }
+   * Public phone — the only phone number shown anywhere on the site.
+   * `null` = no phone shown.
    */
-  phone: null as { display: string; tel: string } | null,
+  phone: { display: "(928) 581-1704", tel: "+19285811704" } as {
+    display: string;
+    tel: string;
+  } | null,
 
   website: "https://izaakvarela.com",
 
-  /** National Producer Number (from your license record). */
+  /** National Producer Number. Used for NIPR verification. */
   npn: "22276637",
 
+  /** Official NIPR lookup page used by the "Verify My Credentials on NIPR" buttons. */
+  niprLookupUrl: "https://nipr.com/licensing-center/look-up-a-national-producer-number",
+
   /**
-   * Google Calendar appointment schedule link, e.g.
-   * "https://calendar.google.com/calendar/appointments/schedules/AcZssZ..."
-   * `null` = online booking is hidden and visitors are pointed to email instead.
+   * Google Calendar appointment schedule — the booking page link from
+   * Google Calendar → your appointment schedule → Share → "Booking page" link.
+   * `null` = online booking hidden; visitors are pointed to phone/email instead.
    */
-  bookingUrl: null as string | null,
+  bookingUrl: "https://calendar.app.google/aEjZtfNMAWdBLpKJA" as string | null,
+
+  /**
+   * Optional: inline embed of the same booking page on /schedule.
+   * Google Calendar → appointment schedule → Share → "Website embed" → "Inline booking page",
+   * then paste ONLY the iframe `src` URL here, e.g.
+   * "https://calendar.google.com/calendar/appointments/schedules/AcZssZ...?gv=true"
+   * `null` = /schedule shows the "Open Booking Page" button only (works on every device).
+   */
+  bookingEmbedUrl: null as string | null,
 
   /**
    * Professional headshot. Replace the file in /public/images (same name) or change `src`.

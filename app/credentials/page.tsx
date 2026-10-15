@@ -2,15 +2,17 @@ import Link from "next/link";
 import { profile } from "@/content/profile";
 import { Portrait } from "@/components/Portrait";
 import { LicenseList } from "@/components/LicenseList";
+import { NiprVerify } from "@/components/NiprVerify";
 import { Icon } from "@/components/Icon";
 import { pageMetadata } from "@/lib/metadata";
 import { personJsonLd } from "@/lib/structured-data";
 import { mailto } from "@/lib/format";
 
 export const metadata = pageMetadata({
-  title: "Licensing & Credentials",
-  description: `Verify the insurance license of ${profile.name}, ${profile.title} (NPN ${profile.npn}), with links to official state license lookups.`,
+  title: "Credentials",
+  description: `Verify ${profile.name}, ${profile.title}. National Producer Number ${profile.npn} — independently verifiable through NIPR.`,
   path: "/credentials",
+  image: "/credentials/opengraph-image",
 });
 
 export default function CredentialsPage() {
@@ -25,19 +27,16 @@ export default function CredentialsPage() {
         <div className="container cred-hero">
           <Portrait priority sizes="220px" className="portrait-sm" />
           <div>
-            <p className="eyebrow eyebrow-light">Licensing &amp; Credentials</p>
+            <p className="eyebrow eyebrow-light">Credentials</p>
             <h1 id="cred-title">{profile.name}</h1>
             <p className="hero-role">{profile.title}</p>
+            <p className="cred-statement">
+              Independent licensed insurance agent · {profile.legalName}
+            </p>
             <dl className="cred-facts">
               <div>
                 <dt>National Producer Number (NPN)</dt>
-                <dd>{profile.npn}</dd>
-              </div>
-              <div>
-                <dt>Email</dt>
-                <dd>
-                  <a href={mailto(profile.email)}>{profile.email}</a>
-                </dd>
+                <dd className="cred-npn">{profile.npn}</dd>
               </div>
               {profile.phone ? (
                 <div>
@@ -47,6 +46,12 @@ export default function CredentialsPage() {
                   </dd>
                 </div>
               ) : null}
+              <div>
+                <dt>Email</dt>
+                <dd>
+                  <a href={mailto(profile.email)}>{profile.email}</a>
+                </dd>
+              </div>
               <div>
                 <dt>Website</dt>
                 <dd>
@@ -58,35 +63,35 @@ export default function CredentialsPage() {
         </div>
       </section>
 
-      <section className="section" aria-labelledby="licenses-title">
+      <section className="section" aria-labelledby="verify-title">
         <div className="container">
-          <div className="section-head">
-            <h2 id="licenses-title">State insurance licenses</h2>
-            <p className="section-intro">
-              {profile.name} is an independent licensed insurance agent. Insurance licensing is
-              issued and regulated at the state level. You can independently verify my credentials
-              using the links below.
-            </p>
-          </div>
+          <h2 id="verify-title" className="sr-only">
+            Verify my credentials
+          </h2>
+          <NiprVerify />
           <LicenseList />
 
           <div className="verify-help">
             <h2 className="h3">How to verify</h2>
             <ol>
               <li>
-                Select <strong>Verify License</strong> for the state you live in.
+                Select <strong>Verify My Credentials on NIPR</strong> to open the official NIPR
+                lookup at nipr.com.
               </li>
               <li>
-                On the state&rsquo;s official website, search for an individual licensee by name (
-                <strong>{profile.name}</strong>), license number, or NPN{" "}
-                <strong>{profile.npn}</strong>.
+                Follow NIPR&rsquo;s on-screen steps to look up the producer, and confirm the
+                National Producer Number matches <strong>{profile.npn}</strong> for{" "}
+                <strong>{profile.name}</strong>.
               </li>
-              <li>Confirm the license status and lines of authority shown by the state.</li>
+              <li>
+                For license status and lines of authority in your state, you can also check your
+                state Department of Insurance&rsquo;s license lookup using my name or NPN.
+              </li>
             </ol>
             <p className="fine-print">
-              I am an independent agent. I am not employed by, affiliated with, or endorsed by any
-              government agency or Department of Insurance. State lookup links are provided so you
-              can confirm my license on your own.
+              I am an independent licensed insurance agent. I am not employed by, affiliated with,
+              or endorsed by NIPR, any Department of Insurance, or any government agency. These
+              links are provided so you can confirm my credentials on your own.
             </p>
           </div>
 

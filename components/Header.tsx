@@ -14,7 +14,9 @@ const links = [
   { href: "/contact", label: "Contact" },
 ];
 
-export function Header({ name, title }: { name: string; title: string }) {
+type Props = { name: string; title: string; phone: { display: string; tel: string } | null };
+
+export function Header({ name, title, phone }: Props) {
   const [open, setOpen] = useState(false);
   const pathname = usePathname();
 
@@ -70,6 +72,12 @@ export function Header({ name, title }: { name: string; title: string }) {
               );
             })}
           </ul>
+          {phone ? (
+            <a className="nav-phone" href={`tel:${phone.tel}`}>
+              <Icon name="phone" size={18} />
+              <span>{phone.display}</span>
+            </a>
+          ) : null}
           <Link href="/schedule" className="button nav-cta" onClick={() => setOpen(false)}>
             Schedule Consultation
           </Link>

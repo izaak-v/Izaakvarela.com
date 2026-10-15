@@ -14,12 +14,15 @@ Next.js (App Router) + TypeScript. No database and no login.
 | FAQ                                                                         | `content/faqs.ts`                |
 | Headshot                                                                    | `public/images/izaak-varela.jpg` |
 
-- **Add a state:** copy the Arizona entry in `content/licenses.ts` and fill in the
-  numbers from your official license record. It appears on the home page, `/credentials`, the
-  footer, and in the structured data automatically.
-- **Booking:** in Google Calendar, open your appointment schedule → Share → copy the booking page
-  link, and paste it into `bookingUrl` in `content/profile.ts`. `/schedule` will embed it.
-- **Phone:** set `phone: { display: "(555) 555-0100", tel: "+15555550100" }` in `content/profile.ts`.
+- **Credentials:** verification is NIPR-first, using `npn` and `niprLookupUrl` in
+  `content/profile.ts`. State license cards are optional — add an entry to `content/licenses.ts`
+  only for a state you've confirmed from your official license record.
+- **Booking:** `bookingUrl` is your Google Calendar appointment booking page link; every
+  "Schedule" button leads to `/schedule`, which opens it. To also show the calendar inline, paste
+  the iframe `src` from Google Calendar → appointment schedule → Share → Website embed → Inline
+  into `bookingEmbedUrl`.
+- **Phone:** `phone: { display: "(928) 581-1704", tel: "+19285811704" }` in `content/profile.ts`
+  — the only phone number used anywhere on the site.
 
 Values left as `null` are hidden on the live site. While running `npm run dev`, a clearly labeled
 placeholder appears in their place instead. Placeholders never appear in a production build.
