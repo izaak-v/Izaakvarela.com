@@ -29,21 +29,26 @@ placeholder appears in their place instead. Placeholders never appear in a produ
 
 ## Contact form
 
-Without configuration, the form opens the visitor's email app with their message filled in.
-To have it send directly to your inbox, create a free [Resend](https://resend.com) account and add
-these environment variables in Vercel, then redeploy:
+Submissions are emailed to `izaak@izaakvarela.com` through [Resend](https://resend.com) — subject
+`Website Inquiry — First Last`, all fields in the body, and the visitor's address as Reply-To.
+Nothing is stored. Until it's configured, the form keeps the visitor's message and offers an
+"Open in my email app" button pre-filled with it.
 
-- `RESEND_API_KEY` (required)
+Set in Vercel → Project → Settings → Environment Variables (Production), then redeploy:
+
+- `RESEND_API_KEY` (required) — server-only; never sent to the browser
 - `CONTACT_TO_EMAIL` (optional; defaults to the email in `content/profile.ts`)
-- `CONTACT_FROM_EMAIL` (optional; defaults to `onboarding@resend.dev`, which can only deliver to
-  your Resend account's own email address. Verify your domain in Resend to use your own address.)
+- `CONTACT_FROM_EMAIL` (optional; defaults to `onboarding@resend.dev`, which only delivers to the
+  email address on your Resend account. Verify `izaakvarela.com` in Resend to send from e.g.
+  `Website <website@izaakvarela.com>`.)
 
 ## Develop
 
 ```bash
 npm install
 npm run dev     # http://localhost:3000 (shows dev placeholders)
-npm run check   # typecheck + lint + format check + production build
+npm run check     # typecheck + lint + format check + production build
+npm run test:e2e  # browser tests: mobile menu, contact form, content guards (iPhone/iPad/desktop)
 ```
 
 ## Deploy

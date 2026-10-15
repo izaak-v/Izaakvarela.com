@@ -7,18 +7,18 @@ export function NiprVerify({ headingLevel = "h3" }: { headingLevel?: "h2" | "h3"
   return (
     <div className="nipr-card">
       <div className="nipr-npn">
-        <span className="nipr-label">National Producer Number (NPN)</span>
+        <span className="nipr-label">National Producer Number</span>
         <span className="nipr-value">{profile.npn}</span>
       </div>
       <div className="nipr-body">
-        <Heading className="h3">Verify independently through NIPR</Heading>
+        <Heading className="h3">Verify through NIPR</Heading>
         <p>
-          Insurance licensing is issued and regulated at the state level. My credentials can be
-          independently verified through the National Insurance Producer Registry (NIPR) using my
-          National Producer Number.
+          Insurance licenses are issued and regulated at the state level. My licensing credentials
+          can be independently verified through the National Insurance Producer Registry (NIPR)
+          using my National Producer Number.
         </p>
         <a
-          className="button button-gold"
+          className="button button-gold button-lg"
           href={profile.niprLookupUrl}
           target="_blank"
           rel="noopener noreferrer"
@@ -27,9 +27,8 @@ export function NiprVerify({ headingLevel = "h3" }: { headingLevel?: "h2" | "h3"
           <span className="sr-only"> (opens nipr.com in a new tab)</span>
         </a>
         <p className="fine-print">
-          NIPR is an independent, nonprofit registry of insurance producer information. I am not
-          affiliated with or endorsed by NIPR or any Department of Insurance. You may also confirm a
-          license directly with your state&rsquo;s Department of Insurance.
+          Independent verification link provided for convenience. I am not affiliated with or
+          endorsed by NIPR, NAIC, or any state Department of Insurance.
         </p>
       </div>
     </div>

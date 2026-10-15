@@ -1,10 +1,16 @@
-export type Faq = { question: string; answer: string };
+export type Faq = {
+  question: string;
+  answer: string;
+  /** Optional link shown after the answer. */
+  link?: { href: string; label: string };
+};
 
 export const faqs: Faq[] = [
   {
     question: "What does a consultation cost?",
     answer:
       "There is no fee for a consultation. We talk through your situation and the options that may be available, and there is no obligation to apply for or purchase anything.",
+    link: { href: "/schedule", label: "Schedule a consultation" },
   },
   {
     question: "What information should I have ready?",
@@ -34,11 +40,13 @@ export const faqs: Faq[] = [
   {
     question: "How can I verify your license?",
     answer:
-      "Insurance licenses are issued and regulated by each state. My credentials can be independently verified through the National Insurance Producer Registry (NIPR) using my National Producer Number (NPN) — the Credentials page has the number and a direct link. You can also check with your state's Department of Insurance.",
+      "Insurance licenses are issued and regulated by each state. My licensing credentials can be independently verified through the National Insurance Producer Registry (NIPR) using my National Producer Number. My Credentials page has the number and a direct link to NIPR.",
+    link: { href: "/credentials", label: "Go to my Credentials page" },
   },
   {
     question: "How do I schedule a follow-up?",
     answer:
-      "Book another time from the Schedule page, call me at (928) 581-1704, or reply to any email from me at izaak@izaakvarela.com. You can also reschedule from the confirmation email you receive when you book online.",
+      "Pick a new time on my Schedule page, call me at (928) 581-1704, or reply to any email from me at izaak@izaakvarela.com.",
+    link: { href: "/schedule", label: "Schedule a follow-up" },
   },
 ];

@@ -42,10 +42,11 @@ export default function Terms() {
 
         <h2>Licensing</h2>
         <p>
-          {profile.name} is a licensed life insurance agent. Licensing information can be verified
-          through the appropriate state Department of Insurance; see the{" "}
-          <Link href="/credentials">Credentials</Link> page. This website is not affiliated with or
-          endorsed by any government agency.
+          {profile.name} is a licensed life insurance agent. Licensing credentials can be
+          independently verified through the National Insurance Producer Registry (NIPR) using
+          National Producer Number {profile.npn}, or through the appropriate state Department of
+          Insurance; see the <Link href="/credentials">Credentials</Link> page. This website is not
+          affiliated with or endorsed by NIPR, NAIC, or any government agency.
         </p>
 
         <h2>Contacting me</h2>

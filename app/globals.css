@@ -17,6 +17,7 @@
   --on-dark: #f4f1e8;
   --on-dark-muted: #c3cfc8;
   --focus: #c9a564;
+  --header-h: 72px;
   --radius: 18px;
   --radius-sm: 12px;
   --max: 1160px;
@@ -33,7 +34,7 @@
 
 html {
   scroll-behavior: smooth;
-  scroll-padding-top: 88px;
+  scroll-padding-top: calc(var(--header-h) + env(safe-area-inset-top) + 16px);
   -webkit-text-size-adjust: 100%;
 }
 
@@ -51,10 +52,6 @@ body {
   font-size: 1.0625rem;
   line-height: 1.65;
   -webkit-font-smoothing: antialiased;
-}
-
-body.menu-open {
-  overflow: hidden;
 }
 
 main:focus {
@@ -139,7 +136,8 @@ code {
   width: 100%;
   max-width: var(--max);
   margin: 0 auto;
-  padding: 0 max(1.25rem, env(safe-area-inset-left));
+  padding-left: max(1.25rem, env(safe-area-inset-left));
+  padding-right: max(1.25rem, env(safe-area-inset-right));
 }
 
 .center {
@@ -309,12 +307,27 @@ code {
 .site-header {
   position: sticky;
   top: 0;
-  z-index: 50;
+  z-index: 1001; /* above the mobile menu sheet so the close button stays tappable */
+  padding-top: env(safe-area-inset-top);
+  color: var(--on-dark);
+  border-bottom: 1px solid rgba(201, 165, 100, 0.25);
+  isolation: isolate;
+}
+
+/* Blur lives on a pseudo-element: backdrop-filter on the header itself would make it the
+   containing block for fixed-position descendants and clip them (the old iPhone menu bug). */
+.site-header::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
   background: rgba(11, 38, 28, 0.94);
   backdrop-filter: saturate(140%) blur(10px);
   -webkit-backdrop-filter: saturate(140%) blur(10px);
-  border-bottom: 1px solid rgba(201, 165, 100, 0.25);
-  color: var(--on-dark);
+}
+
+.site-header.is-open::before {
+  background: var(--green-950);
 }
 
 .header-inner {
@@ -323,13 +336,14 @@ code {
   align-items: center;
   justify-content: space-between;
   gap: 1rem;
-  min-height: 72px;
+  min-height: var(--header-h);
 }
 
 .brand {
   display: flex;
   align-items: center;
   gap: 0.75rem;
+  min-width: 0;
   color: var(--on-dark);
   text-decoration: none;
 }
@@ -356,6 +370,7 @@ code {
 .brand-text {
   display: flex;
   flex-direction: column;
+  min-width: 0;
   line-height: 1.2;
 }
 
@@ -367,24 +382,14 @@ code {
 
 .brand-role {
   white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
   font-size: 0.78rem;
   color: var(--on-dark-muted);
   letter-spacing: 0.02em;
 }
 
-.menu-toggle {
-  display: none;
-  align-items: center;
-  justify-content: center;
-  width: 48px;
-  height: 48px;
-  border-radius: 12px;
-  border: 1px solid rgba(244, 241, 232, 0.25);
-  background: transparent;
-  color: var(--on-dark);
-  cursor: pointer;
-}
-
+/* Desktop navigation */
 .site-nav {
   display: flex;
   align-items: center;
@@ -466,67 +471,104 @@ code {
   color: var(--green-950);
 }
 
+/* Mobile menu toggle + full-screen sheet */
+.menu-toggle {
+  display: none;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  margin-right: -4px;
+  border-radius: 12px;
+  border: 1px solid rgba(244, 241, 232, 0.25);
+  background: transparent;
+  color: var(--on-dark);
+  cursor: pointer;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.mobile-menu {
+  display: none;
+}
+
 @media (max-width: 1023px) {
+  .site-nav {
+    display: none;
+  }
+
   .menu-toggle {
     display: inline-flex;
   }
 
-  .site-nav {
+  .mobile-menu.is-open {
     position: fixed;
-    inset: 72px 0 0 0;
-    flex-direction: column;
-    align-items: stretch;
-    gap: 1.5rem;
-    padding: 1.5rem max(1.25rem, env(safe-area-inset-left)) calc(2rem + env(safe-area-inset-bottom));
+    inset: 0;
+    z-index: 1000; /* above all page content (images, cards, iframes); below the header */
+    display: block;
+    padding-top: calc(var(--header-h) + env(safe-area-inset-top));
     background: var(--green-950);
     overflow-y: auto;
-    opacity: 0;
-    visibility: hidden;
-    transform: translateY(-8px);
-    transition:
-      opacity 0.22s var(--ease),
-      transform 0.22s var(--ease),
-      visibility 0s linear 0.22s;
+    overscroll-behavior: contain;
+    -webkit-overflow-scrolling: touch;
+    animation: menu-in 0.2s var(--ease);
   }
 
-  .site-header.is-open .site-nav {
-    opacity: 1;
-    visibility: visible;
-    transform: none;
-    transition:
-      opacity 0.22s var(--ease),
-      transform 0.22s var(--ease),
-      visibility 0s;
+  .mobile-menu-inner {
+    max-width: 640px;
+    margin: 0 auto;
+    padding: 0.75rem max(1.25rem, env(safe-area-inset-right))
+      calc(2rem + env(safe-area-inset-bottom)) max(1.25rem, env(safe-area-inset-left));
   }
 
-  .site-nav ul {
-    flex-direction: column;
-    gap: 0;
+  .mobile-menu ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
   }
 
-  .site-nav ul a {
-    width: 100%;
+  .mobile-menu ul a {
+    display: flex;
+    align-items: center;
     min-height: 56px;
-    padding: 0 0.25rem;
-    border-radius: 0;
     border-bottom: 1px solid rgba(244, 241, 232, 0.1);
+    color: var(--on-dark);
+    text-decoration: none;
     font-family: var(--font-serif), Georgia, serif;
     font-size: 1.4rem;
   }
 
-  .nav-cta {
-    min-height: 54px;
-    font-size: 1.05rem;
+  .mobile-menu ul a[aria-current="page"] {
+    color: var(--gold-light);
   }
 
-  .nav-phone {
-    display: inline-flex;
-    justify-content: center;
-    min-height: 54px;
-    border: 1.5px solid rgba(244, 241, 232, 0.4);
-    border-radius: 999px;
-    font-size: 1.05rem;
+  .mobile-menu-actions {
+    display: grid;
+    gap: 0.75rem;
+    margin-top: 1.5rem;
   }
+}
+
+@media (max-width: 1023px) and (max-height: 500px) {
+  /* iPhone landscape: tighter rows so more fits before scrolling */
+  .mobile-menu ul a {
+    min-height: 48px;
+    font-size: 1.2rem;
+  }
+}
+
+@keyframes menu-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+html.menu-open {
+  overflow: hidden;
 }
 
 /* ---------- Hero ---------- */
@@ -698,6 +740,7 @@ code {
 }
 
 .portrait-inner {
+  position: relative;
   overflow: hidden;
   border-radius: 18px;
   background: #d9d6d0;
@@ -705,9 +748,24 @@ code {
 }
 
 .portrait-inner img {
+  position: relative;
   width: 100%;
   height: 100%;
   object-fit: cover;
+  color: transparent; /* hides alt text/broken-image glyph so the monogram shows instead */
+}
+
+/* Monogram behind the photo: visible only if the image fails to load. */
+.portrait-inner[data-initials]::before {
+  content: attr(data-initials);
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  font-family: var(--font-serif), Georgia, serif;
+  font-size: 4rem;
+  color: var(--green-800);
+  background: var(--green-100);
 }
 
 .portrait-fallback {
@@ -1125,7 +1183,7 @@ code {
 /* ---------- Steps ---------- */
 .steps {
   list-style: none;
-  margin: 0 0 3rem;
+  margin: 0;
   padding: 0;
   display: grid;
   gap: 1.25rem;
@@ -1425,6 +1483,18 @@ code {
   color: var(--gold-light);
 }
 
+.section-tight {
+  padding-top: clamp(2.5rem, 6vw, 4rem);
+}
+
+.cred-body {
+  max-width: 980px;
+}
+
+.faq-item .faq-link {
+  margin-top: -0.5rem;
+}
+
 .verify-help {
   margin: 3rem 0 1rem;
   padding: clamp(1.5rem, 4vw, 2.25rem);
@@ -1474,7 +1544,9 @@ code {
 }
 
 .booking-frame {
+  position: relative;
   overflow: hidden;
+  width: 100%;
   border-radius: var(--radius);
   border: 1px solid var(--line);
   background: var(--paper);
@@ -1484,9 +1556,82 @@ code {
 .booking-frame iframe {
   display: block;
   width: 100%;
-  height: min(1000px, 85vh);
-  min-height: 640px;
+  max-width: 100%;
+  height: clamp(640px, 85svh, 1000px);
   border: 0;
+}
+
+.booking-loading {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  color: var(--muted);
+  background: var(--paper);
+}
+
+.spinner {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: 3px solid var(--green-100);
+  border-top-color: var(--green-700);
+  animation: spin 0.9s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.booking-compact {
+  display: grid;
+  gap: 0.75rem;
+  justify-items: start;
+}
+
+.booking-compact p {
+  margin: 0;
+}
+
+/* ---------- Contact form success ---------- */
+.form-success {
+  text-align: center;
+  padding: 1.5rem 0.5rem;
+  outline: none;
+}
+
+.form-success-icon {
+  display: inline-grid;
+  place-items: center;
+  width: 56px;
+  height: 56px;
+  margin-bottom: 1rem;
+  border-radius: 50%;
+  background: #e3f1e8;
+  color: #1a6b3f;
+}
+
+.form-success h3 {
+  font-family: var(--font-serif), Georgia, serif;
+  font-size: 1.5rem;
+}
+
+.form-success .button-row {
+  justify-content: center;
+}
+
+.form-status p {
+  margin: 0;
+}
+
+.form-status.mailto {
+  color: var(--ink);
+  font-weight: 500;
 }
 
 .booking {
@@ -1859,4 +2004,15 @@ code {
   .cred-facts a {
     color: #000;
   }
+}
+
+.form-fallback {
+  display: grid;
+  gap: 0.85rem;
+  justify-items: start;
+  padding: 1rem 1.1rem;
+  border-radius: 12px;
+  background: var(--tint);
+  color: var(--ink);
+  font-weight: 500;
 }

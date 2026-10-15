@@ -9,8 +9,8 @@ import { personJsonLd } from "@/lib/structured-data";
 import { mailto } from "@/lib/format";
 
 export const metadata = pageMetadata({
-  title: "Credentials",
-  description: `Verify ${profile.name}, ${profile.title}. National Producer Number ${profile.npn} — independently verifiable through NIPR.`,
+  title: "Verify My Credentials",
+  description: `${profile.name}, ${profile.title}. Verify my licensing credentials independently through NIPR using National Producer Number ${profile.npn}.`,
   path: "/credentials",
   image: "/credentials/opengraph-image",
 });
@@ -30,14 +30,8 @@ export default function CredentialsPage() {
             <p className="eyebrow eyebrow-light">Credentials</p>
             <h1 id="cred-title">{profile.name}</h1>
             <p className="hero-role">{profile.title}</p>
-            <p className="cred-statement">
-              Independent licensed insurance agent · {profile.legalName}
-            </p>
+            <p className="cred-statement">Independent licensed insurance agent · Sole Proprietor</p>
             <dl className="cred-facts">
-              <div>
-                <dt>National Producer Number (NPN)</dt>
-                <dd className="cred-npn">{profile.npn}</dd>
-              </div>
               {profile.phone ? (
                 <div>
                   <dt>Phone</dt>
@@ -63,38 +57,13 @@ export default function CredentialsPage() {
         </div>
       </section>
 
-      <section className="section" aria-labelledby="verify-title">
-        <div className="container">
+      <section className="section section-tight" aria-labelledby="verify-title">
+        <div className="container cred-body">
           <h2 id="verify-title" className="sr-only">
             Verify my credentials
           </h2>
           <NiprVerify />
           <LicenseList />
-
-          <div className="verify-help">
-            <h2 className="h3">How to verify</h2>
-            <ol>
-              <li>
-                Select <strong>Verify My Credentials on NIPR</strong> to open the official NIPR
-                lookup at nipr.com.
-              </li>
-              <li>
-                Follow NIPR&rsquo;s on-screen steps to look up the producer, and confirm the
-                National Producer Number matches <strong>{profile.npn}</strong> for{" "}
-                <strong>{profile.name}</strong>.
-              </li>
-              <li>
-                For license status and lines of authority in your state, you can also check your
-                state Department of Insurance&rsquo;s license lookup using my name or NPN.
-              </li>
-            </ol>
-            <p className="fine-print">
-              I am an independent licensed insurance agent. I am not employed by, affiliated with,
-              or endorsed by NIPR, any Department of Insurance, or any government agency. These
-              links are provided so you can confirm my credentials on your own.
-            </p>
-          </div>
-
           <div className="button-row center">
             <Link className="button" href="/schedule">
               <Icon name="calendar" size={18} /> Schedule a Consultation

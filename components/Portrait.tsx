@@ -10,7 +10,7 @@ export function Portrait({ priority, sizes, className = "" }: Props) {
     <div className={`portrait ${className}`}>
       <span className="portrait-corner tl" aria-hidden="true" />
       <span className="portrait-corner br" aria-hidden="true" />
-      <div className="portrait-inner">
+      <div className="portrait-inner" data-initials="IV">
         {photo ? (
           <Image
             src={photo.src}
