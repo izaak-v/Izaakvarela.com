@@ -28,7 +28,17 @@ export function BookingEmbed({ src, fallbackUrl, title }: Props) {
             <span>Loading available times…</span>
           </div>
         ) : null}
-        <iframe src={src} title={title} onLoad={() => setLoaded(true)} />
+        {/* src is assigned after the load listener is attached, so a fast (cached) load that
+            finishes before hydration can't leave the spinner stuck. */}
+        <iframe
+          title={title}
+          ref={(el) => {
+            if (!el || el.dataset.src) return;
+            el.dataset.src = src;
+            el.addEventListener("load", () => setLoaded(true), { once: true });
+            el.src = src;
+          }}
+        />
       </div>
       <p className="booking-alt" aria-live="polite">
         {slow && !loaded ? "The calendar is taking a while to load. " : "Calendar not showing? "}

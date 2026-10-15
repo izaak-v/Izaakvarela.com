@@ -46,7 +46,9 @@ export const profile = {
    * "https://calendar.google.com/calendar/appointments/schedules/AcZssZ...?gv=true"
    * `null` = /schedule shows the "Open Booking Page" button only (works on every device).
    */
-  bookingEmbedUrl: null as string | null,
+  bookingEmbedUrl:
+    "https://calendar.google.com/calendar/appointments/schedules/AcZssZ1Xss6yM8JYxknHCLrczI9S6x4JeFk6Q1Gs96aUbUMGp_1rMO1r7h7ZdQfb69KDG6u_hjqJbmL9?gv=true" as
+      string | null,
 
   /**
    * Professional headshot. Replace the file in /public/images (same name) or change `src`.
