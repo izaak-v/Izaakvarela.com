@@ -26,12 +26,11 @@ export default function CredentialsPage() {
             <CredentialCard headingLevel="h1" />
           </div>
           <div className="cred-page-copy">
-            <p className="eyebrow">Licensing &amp; credentials</p>
-            <h2 className="h2-sm">How to verify my license</h2>
-            <p className="on-dark">
-              Insurance licenses are issued and regulated at the state level. Current licensing
-              credentials can be independently verified through the National Insurance Producer
-              Registry (NIPR) using my National Producer Number.
+            <p className="eyebrow">Verification</p>
+            <h2 className="title-caps">Licensing &amp; Credentials</h2>
+            <p className="lead on-dark cred-page-lead">
+              Verify my current licensing credentials through the National Insurance Producer
+              Registry.
             </p>
             <div className="npn-callout">
               <span>National Producer Number</span>
@@ -47,8 +46,10 @@ export default function CredentialsPage() {
               <span className="sr-only"> (opens nipr.com in a new tab)</span>
             </a>
             <p className="fine-print on-dark">
-              {profile.serviceArea}. Independent verification link provided for convenience. I am
-              not affiliated with or endorsed by NIPR, NAIC, or any state Department of Insurance.
+              Insurance licenses are issued and regulated at the state level. Current credentials
+              may be independently verified through NIPR or the appropriate state regulator.{" "}
+              {profile.serviceArea}. I am not affiliated with or endorsed by NIPR, NAIC, or any
+              state Department of Insurance.
             </p>
             <LicenseList />
             <p className="cred-page-back">

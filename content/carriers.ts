@@ -1,21 +1,37 @@
 /**
- * Insurance carriers shown in the "Provider network" section.
+ * Carrier roster shown in the "Provider network" marquee (confirmed by Izaak, Oct 2026).
  *
- * Add ONLY carriers you are actually appointed with, confirmed from your own records (for example
- * your contracting/appointment list). Each entry appears publicly. Logos: use official artwork you
- * have permission to display, saved under /public/images/carriers/, and set `logo` to its path —
- * without a logo the carrier's name is shown as text.
+ * Logos: only add official artwork (the carrier's own media/brand page or website asset) that you
+ * have permission to display. Save it under /public/images/carriers/ and set `logo`, `logoWidth`
+ * and `logoHeight`. Until then the carrier is shown as a clean text wordmark — never a guessed or
+ * redrawn logo.
  *
- * Until at least one carrier is listed, the section shows the general provider-network statement
- * without names.
+ * Listing a carrier does not mean every product is available in every state or for every client,
+ * and no carrier endorses this website (see the disclosure under the marquee).
  */
 export type Carrier = {
   name: string;
-  /** e.g. "/images/carriers/example.svg" */
+  /** e.g. "/images/carriers/example.svg" — official asset only. */
   logo?: string;
-  /** Logo width/height in px (intrinsic), required when `logo` is set. */
+  /** Logo intrinsic width/height in px, required when `logo` is set. */
   logoWidth?: number;
   logoHeight?: number;
+  /** Where the logo file came from (kept for the record; not displayed). */
+  logoSource?: string;
 };
 
-export const carriers: Carrier[] = [];
+export const carriers: Carrier[] = [
+  { name: "Aetna" },
+  { name: "American Amicable" },
+  { name: "Americo" },
+  { name: "Corebridge" },
+  { name: "Chubb" },
+  { name: "Ethos" },
+  { name: "Foresters" },
+  { name: "Mutual of Omaha" },
+  { name: "Instabrain" },
+  { name: "Transamerica" },
+  { name: "Royal Neighbors" },
+  { name: "National Life Group" },
+  { name: "F&G" },
+];

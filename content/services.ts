@@ -22,20 +22,6 @@ export const services: Service[] = [
     icon: "shield",
   },
   {
-    id: "term-life",
-    title: "Term Life",
-    summary:
-      "Coverage for a set number of years — often used while children are young or a mortgage is open.",
-    icon: "hourglass",
-  },
-  {
-    id: "permanent-life",
-    title: "Permanent / Whole Life",
-    summary:
-      "Coverage designed to last your lifetime, with some policies building cash value over time.",
-    icon: "pillar",
-  },
-  {
     id: "final-expense",
     title: "Final Expense",
     summary:
@@ -60,5 +46,19 @@ export const services: Service[] = [
     summary:
       "Riders on some policies that may allow early access to benefits for a qualifying illness.",
     icon: "pulse",
+  },
+  {
+    id: "term-life",
+    title: "Term Life",
+    summary:
+      "Coverage for a set number of years — often used while children are young or a mortgage is open.",
+    icon: "hourglass",
+  },
+  {
+    id: "permanent-life",
+    title: "Whole Life / Permanent Coverage",
+    summary:
+      "Coverage designed to last your lifetime, with some policies building cash value over time.",
+    icon: "pillar",
   },
 ];

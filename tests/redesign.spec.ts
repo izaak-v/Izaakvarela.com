@@ -24,7 +24,7 @@ test.describe("homepage", () => {
   test("hero, sections and every CTA target exist", async ({ page }) => {
     await page.goto("/");
     await expect(page.getByRole("heading", { level: 1 })).toHaveText("Izaak Varela");
-    await expect(page.locator(".hero-role")).toHaveText("Licensed Life Insurance Agent");
+    await expect(page.locator(".hero-kicker")).toHaveText("Licensed Life Insurance Agent");
     for (const id of ["about", "coverage", "carriers", "credentials", "request"]) {
       await expect(page.locator(`#${id}`)).toHaveCount(1);
     }
@@ -45,12 +45,20 @@ test.describe("homepage", () => {
       "href",
       "tel:+19285811704",
     );
-    await expect(page.locator(".coverage-card h3")).toHaveCount(8); // 7 categories + CTA card
+    await expect(page.locator(".coverage-list h3")).toHaveText([
+      "Life Insurance",
+      "Final Expense",
+      "Mortgage Protection",
+      "Family Protection",
+      "Living Benefits",
+      "Term Life",
+      "Whole Life / Permanent Coverage",
+    ]);
     // Compliance wording present; no unverified geography.
     const text = await page.locator("body").innerText();
     expect(text).toContain("Serving clients across the U.S. where licensed");
     expect(text).toContain(
-      "Carrier availability varies by state, product, eligibility and underwriting",
+      "Carrier availability varies by state, product, eligibility, and underwriting",
     );
     expect(text).not.toMatch(/licensed nationwide|licensed in all 50|guaranteed approval/i);
   });
