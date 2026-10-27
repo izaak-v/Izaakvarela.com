@@ -10,7 +10,7 @@ const SITE = "https://izaakvarela.com";
 const visitor = {
   firstName: "Jane",
   lastName: "Doe",
-  phone: "(555) 010-0000",
+  phone: "(602) 555-0100",
   email: "jane.visitor@example.com",
   state: "Arizona",
   interest: "Final Expense",

@@ -26,6 +26,14 @@ export const CONTACT_TIMES = ["Morning", "Afternoon", "Evening", "Any time"] as 
 export const QUOTE_CONSENT_TEXT =
   "I agree that Izaak Varela, a licensed life insurance agent, may contact me about my insurance inquiry by phone call, text message, and email at the number and email I provided. Consent is not a condition of purchase. Message frequency varies; message and data rates may apply. Reply STOP to opt out of texts.";
 
+/** Same rule as ProducerOS: 10 digits (optional leading 1); area code and exchange can't start with 0 or 1. */
+export function isUsPhone(input: string): boolean {
+  if (!/^[0-9()+\-.\s]{10,30}$/.test(input)) return false;
+  let digits = input.replace(/\D/g, "");
+  if (digits.length === 11 && digits.startsWith("1")) digits = digits.slice(1);
+  return digits.length === 10 && !/^[01]/.test(digits) && !/^[01]/.test(digits.slice(3));
+}
+
 export type QuotePayload = {
   firstName: string;
   lastName: string;
@@ -71,8 +79,8 @@ export function validateQuote(
   if (!d.firstName)
     return { ok: false, error: "Please enter your first name.", field: "firstName" };
   if (!d.lastName) return { ok: false, error: "Please enter your last name.", field: "lastName" };
-  if (!/^\+?[0-9()\-.\s]{10,30}$/.test(d.phone) || d.phone.replace(/\D/g, "").length < 10)
-    return { ok: false, error: "Please enter a valid phone number.", field: "phone" };
+  if (!isUsPhone(d.phone))
+    return { ok: false, error: "Please enter a valid 10-digit U.S. phone number.", field: "phone" };
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(d.email))
     return { ok: false, error: "Please enter a valid email address.", field: "email" };
   if (!US_STATES.includes(d.state))
