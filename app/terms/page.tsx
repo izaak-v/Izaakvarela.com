@@ -9,7 +9,7 @@ export const metadata = pageMetadata({
   path: "/terms",
 });
 
-const UPDATED = "October 15, 2026";
+const UPDATED = "October 27, 2026";
 
 export default function Terms() {
   const site = profile.website.replace(/^https?:\/\//, "");
@@ -51,10 +51,11 @@ export default function Terms() {
 
         <h2>Contacting me</h2>
         <p>
-          Calling, submitting the contact form, sending an email, or booking a consultation does not
-          create an obligation for either of us, does not constitute an application for insurance,
-          and does not bind coverage. Please do not send Social Security numbers, bank or payment
-          information, or medical information through this website or by email.
+          Calling, requesting coverage, submitting the contact form, sending an email, or booking a
+          consultation does not create an obligation for either of us, does not constitute an
+          application for insurance, and does not bind coverage. Please do not send Social Security
+          numbers, bank or payment information, or medical information through this website or by
+          email.
         </p>
 
         <h2>Third-party services and links</h2>

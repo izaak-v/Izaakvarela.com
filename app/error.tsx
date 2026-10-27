@@ -20,10 +20,10 @@ export default function ErrorPage({ reset }: { error: Error; reset: () => void }
           at <a href={`mailto:${profile.email}`}>{profile.email}</a>.
         </p>
         <div className="button-row center">
-          <button type="button" className="button" onClick={reset}>
+          <button type="button" className="btn btn-dark" onClick={reset}>
             Try again
           </button>
-          <Link className="button button-ghost" href="/">
+          <Link className="btn btn-outline" href="/">
             Back to home
           </Link>
         </div>

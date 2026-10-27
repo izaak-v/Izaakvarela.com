@@ -1,16 +1,16 @@
 import type { Metadata, Viewport } from "next";
-import { Fraunces, Inter } from "next/font/google";
+import { Inter, Plus_Jakarta_Sans } from "next/font/google";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { profile } from "@/content/profile";
 import { siteDescription, siteTitle } from "@/lib/metadata";
 import "./globals.css";
 
-const serif = Fraunces({
+const serif = Plus_Jakarta_Sans({
   subsets: ["latin"],
-  variable: "--font-serif",
+  variable: "--font-display",
   display: "swap",
-  axes: ["opsz"],
+  weight: ["600", "700", "800"],
 });
 const sans = Inter({ subsets: ["latin"], variable: "--font-sans", display: "swap" });
 
@@ -39,7 +39,7 @@ export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
   viewportFit: "cover",
-  themeColor: "#0f3326",
+  themeColor: "#111214",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

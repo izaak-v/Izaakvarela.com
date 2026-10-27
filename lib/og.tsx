@@ -21,14 +21,14 @@ export async function renderOgImage(opts: { eyebrow?: string; lines: string[]; p
         alignItems: "center",
         gap: 64,
         padding: 72,
-        background: "linear-gradient(160deg, #0f3326, #0b261c)",
-        color: "#f4f1e8",
-        fontFamily: "Georgia, serif",
+        background: "linear-gradient(160deg, #1b1d21, #0f1012)",
+        color: "#f3f1ec",
+        fontFamily: "sans-serif",
       }}
     >
       {photo ? (
         <div
-          style={{ display: "flex", padding: 12, border: "2px solid #c9a564", borderRadius: 32 }}
+          style={{ display: "flex", padding: 12, border: "2px solid #f0a43a", borderRadius: 32 }}
         >
           <img
             src={photo}
@@ -46,7 +46,7 @@ export async function renderOgImage(opts: { eyebrow?: string; lines: string[]; p
               fontSize: 24,
               letterSpacing: 4,
               textTransform: "uppercase",
-              color: "#c9a564",
+              color: "#f0a43a",
               fontFamily: "sans-serif",
               marginBottom: 18,
             }}
@@ -57,12 +57,12 @@ export async function renderOgImage(opts: { eyebrow?: string; lines: string[]; p
         <div style={{ fontSize: 84, fontWeight: 700, color: "#ffffff", lineHeight: 1 }}>
           {profile.name}
         </div>
-        <div style={{ fontSize: 40, color: "#e2c991", marginTop: 20 }}>{profile.title}</div>
-        <div style={{ width: 120, height: 3, background: "#c9a564", margin: "36px 0" }} />
+        <div style={{ fontSize: 40, color: "#f0a43a", marginTop: 20 }}>{profile.title}</div>
+        <div style={{ width: 120, height: 3, background: "#f0a43a", margin: "36px 0" }} />
         {opts.lines.map((line) => (
           <div
             key={line}
-            style={{ fontSize: 28, color: "#c3cfc8", marginTop: 10, fontFamily: "sans-serif" }}
+            style={{ fontSize: 28, color: "#b8bcc3", marginTop: 10, fontFamily: "sans-serif" }}
           >
             {line}
           </div>
@@ -75,8 +75,8 @@ export async function renderOgImage(opts: { eyebrow?: string; lines: string[]; p
               marginTop: 32,
               padding: "16px 30px",
               borderRadius: 999,
-              background: "#c9a564",
-              color: "#0b261c",
+              background: "#f0a43a",
+              color: "#0f1012",
               fontSize: 28,
               fontWeight: 700,
               fontFamily: "sans-serif",

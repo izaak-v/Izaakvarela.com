@@ -1,12 +1,10 @@
 import Link from "next/link";
 import { profile } from "@/content/profile";
-import { Portrait } from "@/components/Portrait";
+import { CredentialCard } from "@/components/CredentialCard";
 import { LicenseList } from "@/components/LicenseList";
-import { NiprVerify } from "@/components/NiprVerify";
 import { Icon } from "@/components/Icon";
 import { pageMetadata } from "@/lib/metadata";
 import { personJsonLd } from "@/lib/structured-data";
-import { mailto } from "@/lib/format";
 
 export const metadata = pageMetadata({
   title: "Verify My Credentials",
@@ -16,61 +14,48 @@ export const metadata = pageMetadata({
 });
 
 export default function CredentialsPage() {
-  const site = profile.website.replace(/^https?:\/\//, "");
   return (
     <>
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(personJsonLd()) }}
       />
-      <section className="page-hero page-hero-credentials" aria-labelledby="cred-title">
-        <div className="container cred-hero">
-          <Portrait priority sizes="220px" className="portrait-sm" />
-          <div>
-            <p className="eyebrow eyebrow-light">Credentials</p>
-            <h1 id="cred-title">{profile.name}</h1>
-            <p className="hero-role">{profile.title}</p>
-            <p className="cred-statement">Independent licensed insurance agent · Sole Proprietor</p>
-            <dl className="cred-facts">
-              {profile.phone ? (
-                <div>
-                  <dt>Phone</dt>
-                  <dd>
-                    <a href={`tel:${profile.phone.tel}`}>{profile.phone.display}</a>
-                  </dd>
-                </div>
-              ) : null}
-              <div>
-                <dt>Email</dt>
-                <dd>
-                  <a href={mailto(profile.email)}>{profile.email}</a>
-                </dd>
-              </div>
-              <div>
-                <dt>Website</dt>
-                <dd>
-                  <a href={profile.website}>{site}</a>
-                </dd>
-              </div>
-            </dl>
+      <section className="section section-dark cred-page" aria-labelledby="cred-card-name">
+        <div className="container cred-page-grid">
+          <div className="cred-page-card">
+            <CredentialCard headingLevel="h1" />
           </div>
-        </div>
-      </section>
-
-      <section className="section section-tight" aria-labelledby="verify-title">
-        <div className="container cred-body">
-          <h2 id="verify-title" className="sr-only">
-            Verify my credentials
-          </h2>
-          <NiprVerify />
-          <LicenseList />
-          <div className="button-row center">
-            <Link className="button" href="/schedule">
-              <Icon name="calendar" size={18} /> Schedule a Consultation
-            </Link>
-            <Link className="button button-ghost" href="/contact">
-              Contact Me
-            </Link>
+          <div className="cred-page-copy">
+            <p className="eyebrow">Licensing &amp; credentials</p>
+            <h2 className="h2-sm">How to verify my license</h2>
+            <p className="on-dark">
+              Insurance licenses are issued and regulated at the state level. Current licensing
+              credentials can be independently verified through the National Insurance Producer
+              Registry (NIPR) using my National Producer Number.
+            </p>
+            <div className="npn-callout">
+              <span>National Producer Number</span>
+              <strong className="nipr-value">{profile.npn}</strong>
+            </div>
+            <a
+              className="btn btn-amber btn-lg btn-block"
+              href={profile.niprLookupUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <Icon name="shield" size={18} /> Verify My Credentials on NIPR
+              <span className="sr-only"> (opens nipr.com in a new tab)</span>
+            </a>
+            <p className="fine-print on-dark">
+              {profile.serviceArea}. Independent verification link provided for convenience. I am
+              not affiliated with or endorsed by NIPR, NAIC, or any state Department of Insurance.
+            </p>
+            <LicenseList />
+            <p className="cred-page-back">
+              <Link href="/">
+                <Icon name="arrow" size={16} /> Back to izaakvarela.com
+              </Link>
+            </p>
           </div>
         </div>
       </section>

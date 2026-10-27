@@ -41,6 +41,15 @@ domain) to `izaak@izaakvarela.com`, with the visitor's address as Reply-To — s
 The only setting needed in Vercel → Project → Settings → Environment Variables (Production) is
 `RESEND_API_KEY` — server-only; never sent to the browser.
 
+## Request Coverage form
+
+The homepage form (`/api/quote`) emails each request to `izaak@izaakvarela.com` via Resend (same
+verified sender and Reply-To as the contact form) and records the visitor's consent text and time.
+
+Optional — also create the lead in ProducerOS: in ProducerOS, add an **Inbound source** (Settings →
+Integrations), copy its webhook URL (`https://…/api/inbound-leads/pos_in_…`), and set it in Vercel as
+`PRODUCEROS_INBOUND_URL`. It is used only on the server. Without it, requests are emailed only.
+
 ## Develop
 
 ```bash

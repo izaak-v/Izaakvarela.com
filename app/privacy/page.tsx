@@ -9,7 +9,7 @@ export const metadata = pageMetadata({
   path: "/privacy",
 });
 
-const UPDATED = "October 15, 2026";
+const UPDATED = "October 27, 2026";
 
 export default function Privacy() {
   const site = profile.website.replace(/^https?:\/\//, "");
@@ -29,12 +29,19 @@ export default function Privacy() {
         <h2>Information you choose to give me</h2>
         <ul>
           <li>
+            <strong>Request Coverage form.</strong> If you request coverage, I receive the
+            information you enter: first and last name, phone number, email address, state, and, if
+            you choose, the type and amount of coverage you&rsquo;re interested in, the best time to
+            reach you, and any notes, along with your consent and the time you gave it. The request
+            is emailed to me through Resend and may be saved in the client-management system I use
+            to keep track of inquiries and follow up with you.
+          </li>
+          <li>
             <strong>Contact form.</strong> If you use the contact form, I receive the information
             you enter: first and last name, email address, and, if you choose, phone number, state,
             the topic you&rsquo;re interested in, and your message. The submission is delivered to
             my email inbox through Resend, an email delivery service. (If online delivery is
             unavailable, the form instead opens your own email app so you can send it yourself.)
-            This website does not store form submissions in a database.
           </li>
           <li>
             <strong>Phone and email.</strong> If you call or email me, I receive your phone number
@@ -101,8 +108,9 @@ export default function Privacy() {
           </li>
           <li>
             With service providers that help me operate this website and communicate with you
-            (website hosting by Vercel, email delivery by Resend, and appointment scheduling by
-            Google), only as needed for those services.
+            (website hosting by Vercel, email delivery by Resend, appointment scheduling by Google,
+            and the client-management and messaging tools I use to follow up), only as needed for
+            those services.
           </li>
           <li>When required by law or to protect rights and safety.</li>
         </ul>
