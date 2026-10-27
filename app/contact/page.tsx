@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { profile } from "@/content/profile";
 import { ContactForm } from "@/components/ContactForm";
+import { Faq } from "@/components/Faq";
 import { Icon } from "@/components/Icon";
 import { pageMetadata } from "@/lib/metadata";
 import { mailto } from "@/lib/format";
@@ -48,14 +49,14 @@ export default function ContactPage() {
             </dl>
             <div className="contact-actions">
               {phone ? (
-                <a className="button" href={`tel:${phone.tel}`}>
+                <a className="btn btn-dark" href={`tel:${phone.tel}`}>
                   <Icon name="phone" size={18} /> Call Izaak
                 </a>
               ) : null}
-              <a className="button button-ghost" href={mailto(email)}>
+              <a className="btn btn-outline" href={mailto(email)}>
                 <Icon name="mail" size={18} /> Email Izaak
               </a>
-              <Link className="button button-gold" href="/schedule">
+              <Link className="btn btn-amber" href="/schedule">
                 <Icon name="calendar" size={18} /> Schedule Consultation
               </Link>
             </div>
@@ -67,6 +68,20 @@ export default function ContactPage() {
             <h2 className="h3">Send a message</h2>
             <ContactForm email={email} name={profile.name} phone={phone} />
           </div>
+        </div>
+      </section>
+
+      <section className="section section-mist" aria-labelledby="faq-title">
+        <div className="container faq-grid">
+          <div>
+            <p className="eyebrow eyebrow-dark">FAQ</p>
+            <h2 id="faq-title">Common questions</h2>
+            <p className="section-intro">
+              General, educational answers. Your specific options depend on your situation and each
+              insurance company&rsquo;s underwriting.
+            </p>
+          </div>
+          <Faq />
         </div>
       </section>
     </>

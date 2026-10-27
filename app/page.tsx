@@ -1,40 +1,44 @@
+import Image from "next/image";
 import Link from "next/link";
 import { profile } from "@/content/profile";
 import { services } from "@/content/services";
-import { Portrait } from "@/components/Portrait";
-import { LicenseList } from "@/components/LicenseList";
-import { NiprVerify } from "@/components/NiprVerify";
+import { carriers } from "@/content/carriers";
+import { CarrierMarquee } from "@/components/CarrierMarquee";
+import { CoverageCta } from "@/components/CoverageCta";
+import { CredentialCard } from "@/components/CredentialCard";
+import { Icon } from "@/components/Icon";
+import { QuoteForm } from "@/components/QuoteForm";
 import { Testimonials } from "@/components/Testimonials";
-import { Faq } from "@/components/Faq";
-import { Icon, type IconName } from "@/components/Icon";
+import { mailto } from "@/lib/format";
 import { personJsonLd } from "@/lib/structured-data";
 
-const serviceIcons: Record<string, IconName> = {
-  "life-insurance": "shield",
-  "final-expense": "leaf",
-  "mortgage-protection": "home",
-  "family-protection": "users",
-  "living-benefits": "pulse",
-};
+const expectations = [
+  {
+    title: "Independent and licensed",
+    text: "Access to multiple carriers, not one company's products.",
+  },
+  { title: "Straightforward guidance", text: "Your options explained in plain language." },
+  {
+    title: "Protection that fits",
+    text: "Income, final expenses, your mortgage and the people you love.",
+  },
+  { title: "No pressure", text: "Free consultations, and the decision is always yours." },
+];
 
-const steps = [
+const nextSteps = [
+  { title: "Tell me what you need", text: "A few details — it takes about a minute." },
   {
-    title: "Schedule a conversation",
-    text: "Pick a time that works for you. Consultations are free and there's no obligation.",
+    title: "We talk it through",
+    text: "I'll reach out to review your goals and answer questions.",
   },
   {
-    title: "Review needs and available options",
-    text: "We talk through who you want to protect and what matters to you, then look at options that may fit.",
-  },
-  {
-    title: "Decide whether any option makes sense",
-    text: "You take the time you need. If something fits, I'll help with next steps — if not, that's okay too.",
+    title: "Compare your options",
+    text: "See coverage that may fit, then decide on your timeline.",
   },
 ];
 
 export default function Home() {
-  const { phone } = profile;
-
+  const { phone, photo } = profile;
   return (
     <>
       <script
@@ -42,268 +46,338 @@ export default function Home() {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(personJsonLd()) }}
       />
 
-      {/* HERO */}
+      {/* 1. HERO */}
       <section className="hero" aria-labelledby="hero-title">
-        <div className="container hero-grid">
+        {photo ? (
+          <div className="hero-media" aria-hidden="true">
+            <Image
+              src={photo.src}
+              width={photo.width}
+              height={photo.height}
+              alt=""
+              priority
+              sizes="(min-width: 960px) 50vw, 100vw"
+            />
+          </div>
+        ) : null}
+        <div className="container hero-inner">
           <div className="hero-copy reveal">
-            <p className="eyebrow eyebrow-light">Independent · Licensed · Low-pressure</p>
+            <p className="hero-kicker">{profile.title}</p>
             <h1 id="hero-title">{profile.name}</h1>
-            <p className="hero-role">{profile.title}</p>
+            <p className="hero-statement">Protecting the people and plans you care about most.</p>
             <p className="hero-lede">
-              I help individuals and families understand their life insurance options — so they can
-              make clear, confident decisions about protecting the people and responsibilities that
-              matter most.
+              Independent life insurance guidance for individuals and families — straightforward
+              options from multiple carriers, explained clearly and without pressure.
             </p>
             <div className="hero-actions">
-              <Link className="button button-gold" href="/schedule">
-                <Icon name="calendar" size={18} /> Schedule a Consultation
+              <Link className="btn btn-amber btn-lg" href="#request">
+                Request Coverage
               </Link>
-              <Link className="button button-outline-light" href="/credentials">
-                <Icon name="shield" size={18} /> Verify My Credentials
+              <Link className="btn btn-outline-light btn-lg" href="#credentials">
+                <Icon name="shield" size={18} /> Verify Credentials
               </Link>
             </div>
-            <div className="hero-secondary">
+            <ul className="hero-links">
+              <li>
+                <Link href="/schedule">
+                  <Icon name="calendar" size={18} /> Schedule a Call
+                </Link>
+              </li>
               {phone ? (
-                <a className="text-link-light" href={`tel:${phone.tel}`}>
-                  <Icon name="phone" size={18} /> Call Me
-                  <span className="hero-phone">{phone.display}</span>
-                </a>
+                <li>
+                  <a href={`tel:${phone.tel}`}>
+                    <Icon name="phone" size={18} /> Call Izaak{" "}
+                    <span className="hero-phone">{phone.display}</span>
+                  </a>
+                </li>
               ) : null}
-              <Link className="text-link-light" href="/contact">
-                Contact Me <Icon name="arrow" size={16} />
-              </Link>
-            </div>
-          </div>
-          <div className="hero-photo reveal reveal-delay">
-            <Portrait priority sizes="(min-width: 960px) 420px, 80vw" />
-            <div className="hero-badge">
-              <Icon name="shield" size={18} />
-              <span>
-                Licensed agent
-                <small>NPN {profile.npn}</small>
-              </span>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* TRUST STRIP */}
-      <div className="trust-strip">
-        <div className="container trust-inner">
-          <span>
-            <Icon name="check" size={18} /> {profile.title}
-          </span>
-          <span>
-            <Icon name="check" size={18} /> NPN {profile.npn} · verifiable on NIPR
-          </span>
-          <span>
-            <Icon name="check" size={18} /> Free, no-obligation consultations
-          </span>
-        </div>
-      </div>
-
-      {/* SERVICES */}
-      <section id="services" className="section" aria-labelledby="services-title">
-        <div className="container">
-          <div className="section-head">
-            <p className="eyebrow">How I can help</p>
-            <h2 id="services-title">Coverage I help you understand</h2>
-            <p className="section-intro">
-              Every family&rsquo;s situation is different. These are the areas I most often help
-              people review. Availability, pricing, and eligibility vary by individual, state, and
-              insurance company, and are subject to underwriting.
-            </p>
-          </div>
-          <ul className="service-grid">
-            {services.map((s) => (
-              <li key={s.id} className="service-card">
-                <span className="service-icon">
-                  <Icon name={serviceIcons[s.id] ?? "shield"} size={22} />
-                </span>
-                <h3>{s.title}</h3>
-                <p>{s.summary}</p>
-                <ul className="check-list">
-                  {s.points.map((p) => (
-                    <li key={p}>
-                      <Icon name="check" size={16} /> {p}
-                    </li>
-                  ))}
-                </ul>
-              </li>
-            ))}
-            <li className="service-card service-card-cta">
-              <h3>Not sure where to start?</h3>
-              <p>A short conversation is usually the easiest way to figure out what to look at.</p>
-              <Link className="button button-gold" href="/schedule">
-                Schedule a Consultation
-              </Link>
-            </li>
-          </ul>
-        </div>
-      </section>
-
-      {/* ABOUT */}
-      <section id="about" className="section section-tint" aria-labelledby="about-title">
-        <div className="container about-grid">
-          <div className="about-photo">
-            <Portrait sizes="(min-width: 960px) 360px, 70vw" className="portrait-light" />
-          </div>
-          <div className="about-copy">
-            <p className="eyebrow">About me</p>
-            <h2 id="about-title">A straightforward guide to your options</h2>
-            <p>
-              I&rsquo;m {profile.name}, a licensed life insurance agent. I work with individuals and
-              families to review their goals, understand the coverage options available to them, and
-              make informed decisions.
-            </p>
-            <p>
-              Life insurance can feel complicated. My job is to listen first, explain things in
-              plain language, and give you room to decide what&rsquo;s right for your household and
-              budget — without pressure.
-            </p>
-            <ul className="check-list check-list-lg">
-              <li>
-                <Icon name="check" size={18} /> Understand how life insurance options work
-              </li>
-              <li>
-                <Icon name="check" size={18} /> Identify what you&rsquo;re trying to protect
-              </li>
-              <li>
-                <Icon name="check" size={18} /> Compare coverage options that may fit
-              </li>
-              <li>
-                <Icon name="check" size={18} /> Make an informed decision, on your timeline
-              </li>
             </ul>
           </div>
         </div>
       </section>
 
-      {/* LICENSING */}
-      <section id="licensing" className="section" aria-labelledby="licensing-title">
-        <div className="container">
-          <div className="section-head">
-            <p className="eyebrow">Licensing &amp; Credentials</p>
-            <h2 id="licensing-title">Check my license before we talk</h2>
+      {/* 2. TRUST BAR */}
+      <div className="trust-bar">
+        <ul className="container trust-items" aria-label="Credentials at a glance">
+          <li>{profile.title}</li>
+          <li>NPN {profile.npn}</li>
+          <li>Independent verification</li>
+          <li>Multiple carrier access</li>
+        </ul>
+      </div>
+
+      {/* 3. ABOUT */}
+      <section id="about" className="section about" aria-labelledby="about-title">
+        <div className="container about-grid">
+          <figure className="about-photo">
+            {photo ? (
+              <Image
+                src={photo.src}
+                width={photo.width}
+                height={photo.height}
+                alt={photo.alt}
+                sizes="(min-width: 960px) 440px, 90vw"
+              />
+            ) : null}
+            <figcaption>
+              <strong>{profile.name}</strong>
+              <span>
+                {profile.title} · NPN {profile.npn}
+              </span>
+            </figcaption>
+          </figure>
+          <div className="about-copy">
+            <p className="eyebrow eyebrow-dark">About Izaak</p>
+            <h2 id="about-title">An independent agent in your corner</h2>
+            <p className="lead">
+              I&rsquo;m {profile.name}, an independent licensed life insurance agent. I help
+              individuals and families understand their options and choose coverage that protects
+              their income, final expenses, mortgage and loved ones.
+            </p>
+            <h3 className="list-title">What you can expect</h3>
+            <ul className="expect-list">
+              {expectations.map((e) => (
+                <li key={e.title}>
+                  <Icon name="check" size={18} />
+                  <span>
+                    <strong>{e.title}.</strong> {e.text}
+                  </span>
+                </li>
+              ))}
+            </ul>
+            <div className="button-row">
+              <Link className="btn btn-dark" href="#request">
+                Request Coverage
+              </Link>
+              <Link className="btn btn-outline" href="#credentials">
+                Verify Credentials
+              </Link>
+            </div>
           </div>
-          <NiprVerify />
-          <LicenseList />
-          <p className="section-foot">
-            <Link className="text-link" href="/credentials">
-              View my full credentials page <Icon name="arrow" size={16} />
-            </Link>
-          </p>
         </div>
       </section>
 
-      {/* HOW IT WORKS */}
-      <section className="section section-dark" aria-labelledby="process-title">
-        <div className="container">
-          <div className="section-head">
-            <p className="eyebrow eyebrow-light">How it works</p>
-            <h2 id="process-title">Simple, unhurried, and on your terms</h2>
+      {/* 4. COVERAGE */}
+      <section
+        id="coverage"
+        className="section section-dark coverage"
+        aria-labelledby="coverage-title"
+      >
+        <div className="container coverage-layout">
+          <div className="coverage-head">
+            <p className="eyebrow">Coverage</p>
+            <h2 id="coverage-title">Coverage for every stage of life</h2>
+            <p className="section-intro">
+              Simple, clear options to protect your family — from term coverage while the kids are
+              young to final expense planning. Open any option for a short, plain-language overview.
+            </p>
+            <Link className="btn btn-amber" href="#request">
+              Request Coverage
+            </Link>
+            <p className="fine-print on-dark coverage-disclosure">
+              Coverage features, riders, availability, eligibility, and underwriting vary by
+              carrier, product, and state. This overview is general information, not personal
+              advice.
+            </p>
           </div>
-          <ol className="steps">
-            {steps.map((s, i) => (
-              <li key={s.title} className="step">
-                <span className="step-num" aria-hidden="true">
+          <ol className="coverage-list">
+            {services.map((s, i) => (
+              <li key={s.id} className={s.image ? "has-image" : undefined}>
+                {s.image ? (
+                  <span className="coverage-thumb">
+                    <Image src={s.image} alt="" fill sizes="96px" />
+                  </span>
+                ) : null}
+                <span className="coverage-num" aria-hidden="true">
                   {String(i + 1).padStart(2, "0")}
                 </span>
-                <h3>{s.title}</h3>
-                <p>{s.text}</p>
+                <div className="coverage-text">
+                  <h3 id={`cov-${s.id}`}>{s.title}</h3>
+                  <p>{s.summary}</p>
+                  <details className="coverage-more">
+                    <summary>
+                      <span className="more-closed">Learn more</span>
+                      <span className="more-open">Show less</span>
+                      <span className="sr-only"> about {s.title}</span>
+                      <Icon name="chevron" size={16} />
+                    </summary>
+                    <div className="coverage-detail">
+                      <dl>
+                        <div>
+                          <dt>What it is</dt>
+                          <dd>{s.details.what}</dd>
+                        </div>
+                        <div>
+                          <dt>Often used for</dt>
+                          <dd>{s.details.oftenFor}</dd>
+                        </div>
+                        <div>
+                          <dt>Why people consider it</dt>
+                          <dd>{s.details.why}</dd>
+                        </div>
+                        <div>
+                          <dt>Key points</dt>
+                          <dd>
+                            <ul>
+                              {s.details.keyPoints.map((k) => (
+                                <li key={k}>{k}</li>
+                              ))}
+                            </ul>
+                          </dd>
+                        </div>
+                      </dl>
+                      <CoverageCta interest={s.title}>{s.cta}</CoverageCta>
+                    </div>
+                  </details>
+                </div>
               </li>
             ))}
           </ol>
         </div>
       </section>
 
-      {/* BOOKING CTA */}
-      <section className="section" aria-labelledby="booking-title">
-        <div className="container">
-          <div className="booking-cta">
-            <div>
-              <p className="eyebrow">Appointments</p>
-              <h2 id="booking-title">Book a time that works for you</h2>
-              <p className="section-intro">
-                Pick an open time on my calendar. Consultations are free, and you&rsquo;ll get a
-                confirmation by email. Prefer to talk first? Give me a call.
-              </p>
-            </div>
-            <div className="booking-cta-actions">
-              <Link className="button button-gold button-lg" href="/schedule">
-                <Icon name="calendar" size={18} /> Schedule a Consultation
-              </Link>
-              {phone ? (
-                <a className="button button-ghost" href={`tel:${phone.tel}`}>
-                  <Icon name="phone" size={18} /> Call Me
-                </a>
-              ) : null}
-            </div>
-          </div>
-        </div>
-      </section>
-
       <Testimonials />
 
-      {/* FAQ */}
-      <section id="faq" className="section section-tint" aria-labelledby="faq-title">
-        <div className="container faq-grid">
-          <div>
-            <p className="eyebrow">FAQ</p>
-            <h2 id="faq-title">Common questions</h2>
-            <p className="section-intro">
-              General, educational answers. Your specific options depend on your situation and the
-              insurance company&rsquo;s underwriting.
-            </p>
-            <p>
-              Have a different question?{" "}
-              <Link className="text-link" href="/contact">
-                Send me a message
-              </Link>
-              .
-            </p>
+      {/* 5. CARRIER / PROVIDER NETWORK */}
+      <section id="carriers" className="section carriers" aria-labelledby="carriers-title">
+        <div className="container section-head center">
+          <p className="eyebrow eyebrow-dark">Provider network</p>
+          <h2 id="carriers-title">Access to multiple established carriers</h2>
+          <p className="section-intro">
+            As an independent agent, I compare options across insurance companies to help find
+            coverage that fits your needs and budget.
+          </p>
+        </div>
+        <CarrierMarquee carriers={carriers} />
+        <p className="container carrier-disclosure">
+          Carrier availability varies by state, product, eligibility, and underwriting. Carriers
+          shown do not endorse this website.
+        </p>
+      </section>
+
+      {/* 6–7. LICENSING & CREDENTIALS + CREDENTIAL CARD */}
+      <section
+        id="credentials"
+        className="section section-dark credentials"
+        aria-labelledby="credentials-title"
+      >
+        <div className="container">
+          <div className="credentials-head">
+            <p className="eyebrow">Verification</p>
+            <h2 id="credentials-title" className="title-caps">
+              Licensing &amp; Credentials
+            </h2>
           </div>
-          <Faq />
+          <div className="credentials-grid">
+            <div className="credentials-copy">
+              <p className="lead on-dark">
+                Verify my current licensing credentials through the National Insurance Producer
+                Registry.
+              </p>
+              <dl className="cred-list">
+                <div>
+                  <dt>Agent</dt>
+                  <dd>{profile.name}</dd>
+                </div>
+                <div>
+                  <dt>Title</dt>
+                  <dd>{profile.title}</dd>
+                </div>
+                <div>
+                  <dt>National Producer Number</dt>
+                  <dd className="cred-npn">{profile.npn}</dd>
+                </div>
+                <div>
+                  <dt>Service area</dt>
+                  <dd>{profile.serviceArea}</dd>
+                </div>
+              </dl>
+              <div className="button-row">
+                <a
+                  className="btn btn-amber btn-lg"
+                  href={profile.niprLookupUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <Icon name="shield" size={18} /> Verify My Credentials
+                  <span className="sr-only"> on NIPR (opens nipr.com in a new tab)</span>
+                </a>
+                <Link className="btn btn-outline-light btn-lg" href="/credentials">
+                  Open credential card
+                </Link>
+              </div>
+              <p className="fine-print on-dark">
+                Insurance licenses are issued and regulated at the state level. Current credentials
+                may be independently verified through NIPR or the appropriate state regulator.
+                Independent verification link provided for convenience. I am not affiliated with or
+                endorsed by NIPR, NAIC, or any state Department of Insurance.
+              </p>
+            </div>
+            <div className="credentials-card">
+              <CredentialCard />
+            </div>
+          </div>
         </div>
       </section>
 
-      {/* FINAL CTA / CONTACT */}
-      <section id="contact" className="section cta-band" aria-labelledby="cta-title">
-        <div className="container cta-inner">
-          <div>
-            <h2 id="cta-title">Ready to talk it through?</h2>
-            <p>
-              Book a free consultation, call, or send a quick question first — whatever is easiest.
+      {/* 8. REQUEST COVERAGE */}
+      <section id="request" className="section request" aria-labelledby="request-title">
+        <div className="container request-grid">
+          <div className="request-copy">
+            <p className="eyebrow eyebrow-dark">Request coverage</p>
+            <h2 id="request-title">Request your coverage review</h2>
+            <p className="lead">
+              Share a few details and I&rsquo;ll follow up personally. There&rsquo;s no cost and no
+              obligation.
             </p>
+            <ol className="steps">
+              {nextSteps.map((s, i) => (
+                <li key={s.title}>
+                  <span className="step-num" aria-hidden="true">
+                    {i + 1}
+                  </span>
+                  <span>
+                    <strong>{s.title}</strong>
+                    <span>{s.text}</span>
+                  </span>
+                </li>
+              ))}
+            </ol>
           </div>
-          <ul className="cta-contact">
+          <div className="form-card">
+            <QuoteForm email={profile.email} phone={phone} />
+          </div>
+        </div>
+      </section>
+
+      {/* 9. SCHEDULE / CONTACT */}
+      <section className="connect-band" aria-labelledby="connect-title">
+        <div className="container connect-inner">
+          <div>
+            <p className="eyebrow">Talk with Izaak</p>
+            <h2 id="connect-title">Prefer to pick a time or reach out directly?</h2>
+          </div>
+          <ul className="connect-actions">
             <li>
-              <Link className="cta-tile" href="/schedule">
-                <Icon name="calendar" size={22} />
-                <span>
-                  <strong>Schedule</strong>
-                  <small>Book online</small>
-                </span>
+              <Link className="btn btn-amber btn-lg" href="/schedule">
+                <Icon name="calendar" size={18} /> Schedule a Call
               </Link>
             </li>
             {phone ? (
               <li>
-                <a className="cta-tile" href={`tel:${phone.tel}`}>
-                  <Icon name="phone" size={22} />
-                  <span>
-                    <strong>Call</strong>
-                    <small>{phone.display}</small>
-                  </span>
+                <a className="btn btn-outline-light btn-lg" href={`tel:${phone.tel}`}>
+                  <Icon name="phone" size={18} /> {phone.display}
                 </a>
               </li>
             ) : null}
             <li>
-              <Link className="cta-tile" href="/contact">
-                <Icon name="mail" size={22} />
-                <span>
-                  <strong>Contact</strong>
-                  <small>Email or send a message</small>
-                </span>
+              <a className="btn btn-outline-light btn-lg" href={mailto(profile.email)}>
+                <Icon name="mail" size={18} /> Email Izaak
+              </a>
+            </li>
+            <li>
+              <Link className="connect-link" href="/contact">
+                Send a message <Icon name="arrow" size={16} />
               </Link>
             </li>
           </ul>

@@ -83,11 +83,15 @@ const LIMITS: Record<keyof ContactPayload, number> = {
 const MULTILINE: (keyof ContactPayload)[] = ["message"];
 
 /** Strip control characters (and line breaks from single-line fields, so they can't alter email headers). */
-function clean(key: keyof ContactPayload, value: string): string {
-  if (MULTILINE.includes(key)) {
+export function cleanText(value: string, multiline = false): string {
+  if (multiline) {
     return value.replace(/\r\n?/g, "\n").replace(/[\u0000-\u0009\u000B-\u001F\u007F]/g, "");
   }
   return value.replace(/[\u0000-\u001F\u007F]+/g, " ").replace(/\s{2,}/g, " ");
+}
+
+function clean(key: keyof ContactPayload, value: string): string {
+  return cleanText(value, MULTILINE.includes(key));
 }
 
 /** Returns a cleaned payload, or an error message. Used on both client and server. */

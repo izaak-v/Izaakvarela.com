@@ -88,9 +88,9 @@ test.describe("mobile navigation", () => {
     await openMenu(page);
     const menu = page.locator("#mobile-menu");
     await menu.evaluate((el) => el.scrollTo(0, el.scrollHeight));
-    await expect(menu.getByRole("link", { name: /Schedule Consultation/ })).toBeInViewport();
+    await expect(menu.getByRole("link", { name: /Request Coverage/ })).toBeInViewport();
     await expect(menu.getByRole("link", { name: /Call \(928\) 581-1704/ })).toBeInViewport();
-    await expect(menu.getByRole("link", { name: /Call/ })).toHaveAttribute(
+    await expect(menu.getByRole("link", { name: /Call \(928\)/ })).toHaveAttribute(
       "href",
       "tel:+19285811704",
     );
@@ -120,10 +120,10 @@ test.describe("mobile navigation", () => {
 
   test("in-page links scroll to their section", async ({ page }) => {
     await openMenu(page);
-    await page.locator("#mobile-menu").getByRole("link", { name: "Services" }).click();
-    await expect(page).toHaveURL(/#services$/);
+    await page.locator("#mobile-menu").getByRole("link", { name: "Coverage", exact: true }).click();
+    await expect(page).toHaveURL(/#coverage$/);
     await expectClosed(page);
-    await expect(page.locator("#services h2")).toBeInViewport();
+    await expect(page.locator("#coverage h2")).toBeInViewport();
   });
 
   test("closes when tapping the empty area of the sheet", async ({ page }) => {

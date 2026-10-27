@@ -24,11 +24,11 @@ export function Booking() {
         <p>Call or email with a few days and times that work for you, and I&rsquo;ll confirm.</p>
         <div className="button-row">
           {phone ? (
-            <a className="button" href={`tel:${phone.tel}`}>
+            <a className="btn btn-dark" href={`tel:${phone.tel}`}>
               <Icon name="phone" size={18} /> Call {phone.display}
             </a>
           ) : null}
-          <a className="button button-ghost" href={mailto(email, "Consultation request")}>
+          <a className="btn btn-outline" href={mailto(email, "Consultation request")}>
             <Icon name="mail" size={18} /> Email Izaak
           </a>
         </div>
@@ -37,12 +37,7 @@ export function Booking() {
   }
 
   const openButton = (
-    <a
-      className="button button-gold button-lg"
-      href={bookingUrl}
-      target="_blank"
-      rel="noopener noreferrer"
-    >
+    <a className="btn btn-amber btn-lg" href={bookingUrl} target="_blank" rel="noopener noreferrer">
       <Icon name="calendar" size={18} /> Open Booking Page
       <span className="sr-only"> (Google Calendar, opens in a new tab)</span>
     </a>

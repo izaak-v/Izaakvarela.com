@@ -48,7 +48,7 @@ export function LicenseList() {
           {l.verificationUrl ? (
             <div className="license-verify">
               <a
-                className="button button-small"
+                className="btn btn-dark btn-sm"
                 href={l.verificationUrl}
                 target="_blank"
                 rel="noopener noreferrer"

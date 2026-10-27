@@ -6,9 +6,9 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { Icon } from "./Icon";
 
 const links = [
-  { href: "/", label: "Home" },
-  { href: "/#services", label: "Services" },
+  { href: "/#coverage", label: "Coverage" },
   { href: "/#about", label: "About" },
+  { href: "/#carriers", label: "Carriers" },
   { href: "/credentials", label: "Credentials" },
   { href: "/schedule", label: "Schedule" },
   { href: "/contact", label: "Contact" },
@@ -134,8 +134,8 @@ export function Header({ name, title, phone }: Props) {
                 <span>{phone.display}</span>
               </a>
             ) : null}
-            <Link href="/schedule" className="button nav-cta">
-              Schedule Consultation
+            <Link href="/#request" className="btn btn-amber nav-cta">
+              Request Coverage
             </Link>
           </nav>
 
@@ -161,21 +161,26 @@ export function Header({ name, title, phone }: Props) {
         className={`mobile-menu${open ? " is-open" : ""}`}
         hidden={!open}
         onClick={(e) => {
-          if (e.target === e.currentTarget) closeMenu(true);
+          // Tapping empty space in the sheet (not a link or button) closes it.
+          const t = e.target as HTMLElement;
+          if (t === e.currentTarget || t.classList.contains("mobile-menu-inner")) closeMenu(true);
         }}
       >
         <nav className="mobile-menu-inner" aria-label="Mobile">
           <NavLinks pathname={pathname} onNavigate={closeMenu} />
           <div className="mobile-menu-actions">
+            <Link href="/#request" className="btn btn-amber btn-lg" onClick={() => closeMenu()}>
+              <Icon name="shield" size={18} /> Request Coverage
+            </Link>
             <Link
               href="/schedule"
-              className="button button-gold button-lg"
+              className="btn btn-outline-light btn-lg"
               onClick={() => closeMenu()}
             >
-              <Icon name="calendar" size={18} /> Schedule Consultation
+              <Icon name="calendar" size={18} /> Schedule a Call
             </Link>
             {phone ? (
-              <a className="button button-outline-light button-lg" href={`tel:${phone.tel}`}>
+              <a className="btn btn-outline-light btn-lg" href={`tel:${phone.tel}`}>
                 <Icon name="phone" size={18} /> Call {phone.display}
               </a>
             ) : null}

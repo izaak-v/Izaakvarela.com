@@ -26,6 +26,9 @@ export const profile = {
 
   website: "https://izaakvarela.com",
 
+  /** Licensing footprint statement. Keep generic unless every state is confirmed. */
+  serviceArea: "Serving clients across the U.S. where licensed",
+
   /** National Producer Number. Used for NIPR verification. */
   npn: "22276637",
 
@@ -68,5 +71,5 @@ export const profile = {
    * SMS / text messaging. Keep `false` unless you actually text clients (e.g. via Twilio).
    * When `true`, the Privacy Policy adds a text-messaging section.
    */
-  smsEnabled: false,
+  smsEnabled: true,
 };

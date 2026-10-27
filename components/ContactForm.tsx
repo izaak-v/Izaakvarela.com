@@ -92,11 +92,11 @@ export function ContactForm({ email, name, phone }: Props) {
         <h3>Thanks — your message has been sent.</h3>
         <p>I&rsquo;ll get back to you as soon as I can.</p>
         <div className="button-row">
-          <Link className="button button-gold" href="/schedule">
+          <Link className="btn btn-amber" href="/schedule">
             <Icon name="calendar" size={18} /> Schedule a Consultation
           </Link>
           {phone ? (
-            <a className="button button-ghost" href={`tel:${phone.tel}`}>
+            <a className="btn btn-outline" href={`tel:${phone.tel}`}>
               <Icon name="phone" size={18} /> Call Me
             </a>
           ) : null}
@@ -188,7 +188,7 @@ export function ContactForm({ email, name, phone }: Props) {
 
       <div className="form-actions">
         <button
-          className="button"
+          className="btn btn-dark"
           type="submit"
           disabled={status.kind === "sending"}
           aria-disabled={status.kind === "sending"}
@@ -212,7 +212,7 @@ export function ContactForm({ email, name, phone }: Props) {
               ) : null}
               .
             </p>
-            <a className="button button-gold" href={status.mailtoHref}>
+            <a className="btn btn-amber" href={status.mailtoHref}>
               <Icon name="mail" size={18} /> Open in my email app
             </a>
           </div>
