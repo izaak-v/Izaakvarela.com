@@ -4,6 +4,7 @@ import { profile } from "@/content/profile";
 import { services } from "@/content/services";
 import { carriers } from "@/content/carriers";
 import { CarrierMarquee } from "@/components/CarrierMarquee";
+import { CoverageCta } from "@/components/CoverageCta";
 import { CredentialCard } from "@/components/CredentialCard";
 import { Icon } from "@/components/Icon";
 import { QuoteForm } from "@/components/QuoteForm";
@@ -225,9 +226,7 @@ export default function Home() {
                           </dd>
                         </div>
                       </dl>
-                      <Link className="coverage-cta-link" href="#request">
-                        {s.cta} <Icon name="arrow" size={16} />
-                      </Link>
+                      <CoverageCta interest={s.title}>{s.cta}</CoverageCta>
                     </div>
                   </details>
                 </div>

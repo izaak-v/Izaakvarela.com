@@ -1,4 +1,5 @@
 import type { IconName } from "@/components/Icon";
+import type { QuoteInterest } from "@/lib/quote";
 
 /**
  * Coverage categories shown in the homepage coverage section and used as topics in the forms.
@@ -12,7 +13,8 @@ import type { IconName } from "@/components/Icon";
  */
 export type Service = {
   id: string;
-  title: string;
+  /** Also the Request Coverage form option this row's CTA preselects. */
+  title: Exclude<QuoteInterest, "Not Sure">;
   summary: string;
   details: {
     /** What it is. */

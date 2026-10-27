@@ -8,8 +8,18 @@ export const QUOTE_INTERESTS = [
   "Mortgage Protection",
   "Family Protection",
   "Living Benefits",
+  "Term Life",
+  "Whole Life / Permanent Coverage",
   "Not Sure",
 ] as const;
+
+export type QuoteInterest = (typeof QUOTE_INTERESTS)[number];
+
+/**
+ * Window event a coverage CTA fires to preselect "What are you looking for?" before jumping to the
+ * form. The value travels in the event, never in the URL.
+ */
+export const QUOTE_INTEREST_EVENT = "quote:interest";
 
 export const COVERAGE_RANGES = [
   "Under $25,000",

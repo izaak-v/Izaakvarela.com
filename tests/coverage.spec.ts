@@ -145,3 +145,72 @@ test.describe("coverage breakdowns — reduced motion", () => {
     await noHorizontalScroll(page);
   });
 });
+
+const CTA_TO_OPTION: [cta: string, option: string][] = [
+  ["Explore Life Insurance Options", "Life Insurance"],
+  ["Explore Final Expense Coverage", "Final Expense"],
+  ["Explore Mortgage Protection", "Mortgage Protection"],
+  ["Build a Family Protection Plan", "Family Protection"],
+  ["Learn About Living Benefits", "Living Benefits"],
+  ["Explore Term Coverage", "Term Life"],
+  ["Explore Permanent Coverage", "Whole Life / Permanent Coverage"],
+];
+
+async function clickCta(page: Page, cta: string, option: string) {
+  const row = rows(page).nth(COVERAGE.indexOf(option));
+  await row.locator("summary").click();
+  await row.getByRole("link", { name: new RegExp(cta) }).click();
+}
+
+test.describe("coverage CTAs preselect the Request Coverage form", () => {
+  test("the form offers every coverage category plus Not Sure", async ({ page }) => {
+    await page.goto("/");
+    await expect(page.locator("#q-interest option")).toHaveText([
+      "Choose one",
+      ...COVERAGE,
+      "Not Sure",
+    ]);
+  });
+
+  for (const [cta, option] of CTA_TO_OPTION) {
+    test(`"${cta}" selects ${option}`, async ({ page }) => {
+      await page.goto("/");
+      // A marker on window survives only if the page is not reloaded.
+      await page.evaluate(() => ((window as unknown as { __noReload: boolean }).__noReload = true));
+      await clickCta(page, cta, option);
+      await expect(page.locator("#q-interest")).toHaveValue(option);
+      await expect(page.locator("#request h2")).toBeInViewport();
+      // Nothing but the in-page anchor goes into the URL.
+      expect(new URL(page.url()).search).toBe("");
+      expect(new URL(page.url()).hash).toBe("#request");
+      expect(
+        await page.evaluate(() => (window as unknown as { __noReload?: boolean }).__noReload),
+      ).toBe(true);
+      await noHorizontalScroll(page);
+    });
+  }
+
+  test("the visitor can change the preselected option, and a later CTA updates it", async ({
+    page,
+  }) => {
+    await page.goto("/");
+    await clickCta(page, "Explore Term Coverage", "Term Life");
+    await expect(page.locator("#q-interest")).toHaveValue("Term Life");
+    await page.selectOption("#q-interest", "Not Sure");
+    await expect(page.locator("#q-interest")).toHaveValue("Not Sure");
+    await clickCta(page, "Explore Mortgage Protection", "Mortgage Protection");
+    await expect(page.locator("#q-interest")).toHaveValue("Mortgage Protection");
+  });
+
+  test("works from the keyboard", async ({ page }) => {
+    await page.goto("/");
+    const row = rows(page).nth(COVERAGE.indexOf("Living Benefits"));
+    await row.locator("summary").focus();
+    await page.keyboard.press("Enter");
+    await page.keyboard.press("Tab");
+    await expect(row.locator(".coverage-cta-link")).toBeFocused();
+    await page.keyboard.press("Enter");
+    await expect(page.locator("#q-interest")).toHaveValue("Living Benefits");
+    await expect(page).toHaveURL(/#request$/);
+  });
+});

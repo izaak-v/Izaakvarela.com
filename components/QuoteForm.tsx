@@ -1,13 +1,14 @@
 "use client";
 
 import Link from "next/link";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { US_STATES } from "@/lib/contact";
 import {
   CONTACT_TIMES,
   COVERAGE_RANGES,
   QUOTE_CONSENT_TEXT,
   QUOTE_INTERESTS,
+  QUOTE_INTEREST_EVENT,
   formatQuoteEmail,
   quoteSubject,
   validateQuote,
@@ -27,6 +28,18 @@ export function QuoteForm({ email, phone }: Props) {
   const [status, setStatus] = useState<Status>({ kind: "idle" });
   const inFlight = useRef(false);
   const formRef = useRef<HTMLFormElement>(null);
+  const interestRef = useRef<HTMLSelectElement>(null);
+
+  // Coverage CTAs preselect the matching option; the visitor can still change it.
+  useEffect(() => {
+    const onInterest = (e: Event) => {
+      const value = (e as CustomEvent<unknown>).detail;
+      if (interestRef.current && (QUOTE_INTERESTS as readonly unknown[]).includes(value))
+        interestRef.current.value = value as string;
+    };
+    window.addEventListener(QUOTE_INTEREST_EVENT, onInterest);
+    return () => window.removeEventListener(QUOTE_INTEREST_EVENT, onInterest);
+  }, []);
   const errField = status.kind === "error" ? status.field : undefined;
   const invalid = (f: string) =>
     errField === f ? { "aria-invalid": true, "aria-describedby": "quote-error" } : {};
@@ -213,7 +226,13 @@ export function QuoteForm({ email, phone }: Props) {
           <label htmlFor="q-interest">
             What are you looking for? <span className="optional">(optional)</span>
           </label>
-          <select id="q-interest" name="interest" defaultValue="" {...invalid("interest")}>
+          <select
+            ref={interestRef}
+            id="q-interest"
+            name="interest"
+            defaultValue=""
+            {...invalid("interest")}
+          >
             <option value="">Choose one</option>
             {QUOTE_INTERESTS.map((t) => (
               <option key={t}>{t}</option>

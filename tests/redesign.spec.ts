@@ -219,6 +219,12 @@ test.describe("request coverage — server", () => {
       field: "state",
     });
     expect(validateQuote(visitor)).toMatchObject({ ok: true });
+    for (const interest of ["Term Life", "Whole Life / Permanent Coverage"])
+      expect(validateQuote({ ...visitor, interest })).toMatchObject({ ok: true });
+    expect(validateQuote({ ...visitor, interest: "Annuities" })).toMatchObject({
+      ok: false,
+      field: "interest",
+    });
   });
 
   test("email uses the verified sender, Reply-To the visitor, and records consent", () => {
