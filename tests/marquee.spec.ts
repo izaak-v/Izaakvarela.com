@@ -1,17 +1,18 @@
 import { expect, test } from "@playwright/test";
+import { carriers } from "@/content/carriers";
 
 const CARRIERS = [
   "Aetna",
   "American Amicable",
   "Americo",
-  "Corebridge",
+  "Corebridge Financial",
   "Chubb",
   "Ethos",
-  "Foresters",
+  "Foresters Financial",
   "Mutual of Omaha",
   "Instabrain",
   "Transamerica",
-  "Royal Neighbors",
+  "Royal Neighbors of America",
   "National Life Group",
   "F&G",
 ];
@@ -30,17 +31,69 @@ test.describe("carrier marquee", () => {
   }) => {
     await page.goto("/");
     const list = page.getByRole("list", { name: "Insurance carriers" });
-    await expect(list.locator(".marquee-item")).toHaveText(CARRIERS);
+    await expect(list.locator(".marquee-item")).toHaveCount(CARRIERS.length);
+    expect(
+      await list.getByRole("img").evaluateAll((els) => els.map((e) => e.getAttribute("alt"))),
+    ).toEqual(CARRIERS);
     // The duplicate copy that makes the loop seamless is hidden from screen readers.
     const lists = page.locator(".marquee-list");
     await expect(lists).toHaveCount(2);
     await expect(lists.nth(1)).toHaveAttribute("aria-hidden", "true");
-    await expect(lists.nth(1).locator(".marquee-item")).toHaveText(CARRIERS);
+    const dupes = lists.nth(1).locator("img.marquee-logo");
+    await expect(dupes).toHaveCount(CARRIERS.length);
+    expect(await dupes.evaluateAll((els) => els.map((e) => e.getAttribute("alt")))).toEqual(
+      CARRIERS.map(() => ""),
+    );
     await expect(page.locator("#carriers")).toContainText(
       "Carrier availability varies by state, product, eligibility, and underwriting.",
     );
     await expect(page.locator("#carriers")).not.toContainText(/endorsed by/i);
     await noHorizontalScroll(page);
+  });
+
+  test("every carrier is a real logo that loads, unstretched and size-normalised", async ({
+    page,
+  }) => {
+    const failed: string[] = [];
+    page.on("response", (r) => {
+      if (r.url().includes("carriers") && r.status() >= 400)
+        failed.push(`${r.status()} ${r.url()}`);
+    });
+    await page.goto("/");
+    await page.locator("#carriers").scrollIntoViewIfNeeded();
+    await expect(page.locator(".marquee-wordmark")).toHaveCount(0);
+    const logos = page.locator(".marquee-list").first().locator("img.marquee-logo");
+    await expect(logos).toHaveCount(CARRIERS.length);
+    await expect
+      .poll(() =>
+        page
+          .locator("img.marquee-logo")
+          .evaluateAll((els) =>
+            (els as HTMLImageElement[]).every((i) => i.complete && i.naturalWidth > 0),
+          ),
+      )
+      .toBe(true);
+    const boxes = await logos.evaluateAll((els) =>
+      (els as HTMLImageElement[]).map((i) => {
+        const r = i.getBoundingClientRect();
+        return {
+          alt: i.alt,
+          w: r.width,
+          h: r.height,
+          rowH: i.parentElement!.getBoundingClientRect().height,
+        };
+      }),
+    );
+    for (const b of boxes) {
+      // Aspect ratio matches the source PNG (no stretching), and every logo fits its row.
+      const c = carriers.find((x) => x.name === b.alt)!;
+      const ratio = c.logoWidth! / c.logoHeight!;
+      expect(Math.abs(b.w / b.h - ratio) / ratio, b.alt).toBeLessThan(0.02);
+      expect(b.h, b.alt).toBeGreaterThanOrEqual(18);
+      expect(b.h, b.alt).toBeLessThanOrEqual(b.rowH);
+      expect(b.w, b.alt).toBeLessThanOrEqual(260);
+    }
+    expect(failed).toEqual([]);
   });
 
   test("loops seamlessly: both copies are identical width and the track moves exactly one copy", async ({

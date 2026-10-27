@@ -9,6 +9,15 @@ import type { Carrier } from "@/content/carriers";
  * get the single labelled list. Motion pauses on hover/focus and is disabled entirely under
  * prefers-reduced-motion, where the list wraps as a static row instead.
  */
+/**
+ * Logos are normalised by visual area rather than one fixed height: a wide wordmark gets less height
+ * than a compact mark, so every logo reads at a similar size. Returns the desktop height in px; CSS
+ * scales it down on small screens.
+ */
+const LOGO_AREA = 6400;
+const logoHeight = (w: number, h: number, scale = 1) =>
+  Math.round(Math.min(56, Math.max(22, Math.sqrt(LOGO_AREA / (w / h)) * scale)));
+
 export function CarrierMarquee({ carriers }: { carriers: Carrier[] }) {
   const items = (copy: 0 | 1) =>
     carriers.map((c) => (
@@ -19,8 +28,15 @@ export function CarrierMarquee({ carriers }: { carriers: Carrier[] }) {
             alt={copy === 0 ? c.name : ""}
             width={c.logoWidth}
             height={c.logoHeight}
-            sizes="180px"
+            sizes={`${Math.ceil((logoHeight(c.logoWidth, c.logoHeight, c.logoScale) * c.logoWidth) / c.logoHeight)}px`}
             className="marquee-logo"
+            // Eager: the track is wider than the screen, and lazy logos could pop in mid-loop.
+            loading="eager"
+            style={
+              {
+                "--logo-h": `${logoHeight(c.logoWidth, c.logoHeight, c.logoScale)}px`,
+              } as React.CSSProperties
+            }
           />
         ) : (
           <span className="marquee-wordmark">{c.name}</span>

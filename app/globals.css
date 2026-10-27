@@ -2894,9 +2894,17 @@ html.menu-open {
 }
 
 .marquee-item {
+  --logo-scale: 1;
   display: flex;
   align-items: center;
-  height: 44px;
+  height: 60px;
+}
+
+@media (max-width: 720px) {
+  .marquee-item {
+    --logo-scale: 0.78;
+    height: 48px;
+  }
 }
 
 .marquee-wordmark {
@@ -2909,10 +2917,11 @@ html.menu-open {
 }
 
 .marquee-logo {
-  height: 40px;
+  display: block;
+  height: max(18px, calc(var(--logo-h, 40px) * var(--logo-scale)));
   width: auto;
-  filter: grayscale(1);
-  opacity: 0.8;
+  max-width: none;
+  object-fit: contain;
 }
 
 @keyframes marquee {
