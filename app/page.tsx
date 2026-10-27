@@ -168,13 +168,15 @@ export default function Home() {
             <h2 id="coverage-title">Coverage for every stage of life</h2>
             <p className="section-intro">
               Simple, clear options to protect your family — from term coverage while the kids are
-              young to final expense planning.
+              young to final expense planning. Open any option for a short, plain-language overview.
             </p>
             <Link className="btn btn-amber" href="#request">
               Request Coverage
             </Link>
-            <p className="fine-print on-dark">
-              Availability, pricing and eligibility vary by state, carrier and underwriting.
+            <p className="fine-print on-dark coverage-disclosure">
+              Coverage features, riders, availability, eligibility, and underwriting vary by
+              carrier, product, and state. This overview is general information, not personal
+              advice.
             </p>
           </div>
           <ol className="coverage-list">
@@ -189,8 +191,45 @@ export default function Home() {
                   {String(i + 1).padStart(2, "0")}
                 </span>
                 <div className="coverage-text">
-                  <h3>{s.title}</h3>
+                  <h3 id={`cov-${s.id}`}>{s.title}</h3>
                   <p>{s.summary}</p>
+                  <details className="coverage-more">
+                    <summary>
+                      <span className="more-closed">Learn more</span>
+                      <span className="more-open">Show less</span>
+                      <span className="sr-only"> about {s.title}</span>
+                      <Icon name="chevron" size={16} />
+                    </summary>
+                    <div className="coverage-detail">
+                      <dl>
+                        <div>
+                          <dt>What it is</dt>
+                          <dd>{s.details.what}</dd>
+                        </div>
+                        <div>
+                          <dt>Often used for</dt>
+                          <dd>{s.details.oftenFor}</dd>
+                        </div>
+                        <div>
+                          <dt>Why people consider it</dt>
+                          <dd>{s.details.why}</dd>
+                        </div>
+                        <div>
+                          <dt>Key points</dt>
+                          <dd>
+                            <ul>
+                              {s.details.keyPoints.map((k) => (
+                                <li key={k}>{k}</li>
+                              ))}
+                            </ul>
+                          </dd>
+                        </div>
+                      </dl>
+                      <Link className="coverage-cta-link" href="#request">
+                        {s.cta} <Icon name="arrow" size={16} />
+                      </Link>
+                    </div>
+                  </details>
                 </div>
               </li>
             ))}
