@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { profile } from "@/content/profile";
 import { buildQuoteEmail } from "@/lib/contact-email";
-import { forwardToProducerOs, producerOsInboundUrl } from "@/lib/producer-os";
+import { consentPageUrl, forwardToProducerOs, producerOsInboundUrl } from "@/lib/producer-os";
 import { validateQuote } from "@/lib/quote";
 
 /**
@@ -65,6 +65,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: result.error, field: result.field }, { status: 400 });
   const d = result.data;
   const submittedAt = new Date();
+  const pageUrl = consentPageUrl(body.pageUrl, host);
 
   const [emailed, forwarded] = await Promise.all([
     apiKey
@@ -85,7 +86,7 @@ export async function POST(request: Request) {
           })
       : Promise.resolve(false),
     crmUrl
-      ? forwardToProducerOs(crmUrl, d, submittedAt)
+      ? forwardToProducerOs(crmUrl, d, submittedAt, pageUrl)
           .then(() => true)
           .catch((err) => {
             console.error("Quote form: ProducerOS forward failed", err);

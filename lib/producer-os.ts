@@ -1,4 +1,5 @@
-import { QUOTE_CONSENT_TEXT, type QuotePayload } from "@/lib/quote";
+import { profile } from "@/content/profile";
+import { QUOTE_CONSENT_TEXT, SMS_CONSENT_TEXT, type QuotePayload } from "@/lib/quote";
 
 /**
  * Optional: forward "Request Coverage" submissions to ProducerOS as a new lead, server-side only.
@@ -22,8 +23,30 @@ export function producerOsInboundUrl(): string | null {
   }
 }
 
-/** Maps a submission onto ProducerOS's standard inbound field names. */
-export function toInboundLead(d: QuotePayload, submittedAt: Date) {
+/**
+ * The page the form was submitted from, for the SMS consent record: the browser-reported URL when it
+ * is on this site (query and hash dropped), otherwise the site's home page.
+ */
+export function consentPageUrl(raw: unknown, host: string | null): string {
+  const fallback = `${profile.website}/`;
+  if (typeof raw !== "string" || !host) return fallback;
+  try {
+    const u = new URL(raw);
+    if (!/^https?:$/.test(u.protocol) || u.host !== host) return fallback;
+    return `${u.origin}${u.pathname}`;
+  } catch {
+    return fallback;
+  }
+}
+
+/**
+ * Maps a submission onto ProducerOS's standard inbound field names.
+ *
+ * The sms_consent* fields are not standard ProducerOS inbound names: ProducerOS keeps them in the
+ * lead's notes ("Additional fields") and its inbound request log. Mapping `sms_consent=smsPermission`
+ * on the inbound source also sets the lead's SMS permission.
+ */
+export function toInboundLead(d: QuotePayload, submittedAt: Date, pageUrl = `${profile.website}/`) {
   const notes = [
     d.coverageRange ? `Desired coverage: ${d.coverageRange}` : "",
     d.message ? `Notes from the form:\n${d.message}` : "",
@@ -43,15 +66,24 @@ export function toInboundLead(d: QuotePayload, submittedAt: Date) {
     lead_source: "izaakvarela.com",
     consent_timestamp: submittedAt.toISOString(),
     consent_source: "izaakvarela.com Request Coverage form (consent checkbox)",
+    sms_consent: d.smsConsent,
+    sms_consent_timestamp: d.smsConsent ? submittedAt.toISOString() : undefined,
+    sms_consent_source: pageUrl,
+    sms_consent_text: SMS_CONSENT_TEXT,
     notes,
   };
 }
 
-export async function forwardToProducerOs(url: string, d: QuotePayload, submittedAt: Date) {
+export async function forwardToProducerOs(
+  url: string,
+  d: QuotePayload,
+  submittedAt: Date,
+  pageUrl?: string,
+) {
   const res = await fetch(url, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(toInboundLead(d, submittedAt)),
+    body: JSON.stringify(toInboundLead(d, submittedAt, pageUrl)),
     signal: AbortSignal.timeout(10000),
   });
   if (!res.ok) throw new Error(`ProducerOS inbound responded ${res.status}`);

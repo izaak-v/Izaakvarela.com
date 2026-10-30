@@ -32,9 +32,19 @@ export const COVERAGE_RANGES = [
 
 export const CONTACT_TIMES = ["Morning", "Afternoon", "Evening", "Any time"] as const;
 
-/** Shown next to the consent checkbox, and recorded with each submission. */
+/**
+ * Shown next to the required consent checkbox, and recorded with each submission. Covers calls and
+ * email only: texting has its own optional checkbox (SMS_CONSENT_TEXT), as A2P 10DLC requires.
+ */
 export const QUOTE_CONSENT_TEXT =
-  "I agree that Izaak Varela, a licensed life insurance agent, may contact me about my insurance inquiry by phone call, text message, and email at the number and email I provided. Consent is not a condition of purchase. Message frequency varies; message and data rates may apply. Reply STOP to opt out of texts.";
+  "I agree that Izaak Varela, a licensed life insurance agent, may contact me about my insurance inquiry by phone call and email at the number and email I provided. Consent is not a condition of purchase.";
+
+/**
+ * Optional SMS opt-in (A2P 10DLC). Shown verbatim next to its own unchecked checkbox, followed by
+ * links to /privacy and /terms, and recorded with the submission. Never required to submit.
+ */
+export const SMS_CONSENT_TEXT =
+  "I agree to receive recurring text messages from Izaak Varela regarding my life insurance inquiry, coverage options, appointment scheduling and reminders, and follow-up. Message frequency varies. Message and data rates may apply. Reply STOP to opt out and HELP for help. Consent is not a condition of purchase.";
 
 /** Same rule as ProducerOS: 10 digits (optional leading 1); area code and exchange can't start with 0 or 1. */
 export function isUsPhone(input: string): boolean {
@@ -55,6 +65,8 @@ export type QuotePayload = {
   bestTime: string;
   message: string;
   consent: boolean;
+  /** Optional SMS opt-in; false unless the visitor checked the SMS box. */
+  smsConsent: boolean;
 };
 
 const LIMITS = {
@@ -74,7 +86,7 @@ type TextKey = keyof typeof LIMITS;
 export function validateQuote(
   input: Record<string, unknown>,
 ): { ok: true; data: QuotePayload } | { ok: false; error: string; field?: string } {
-  const d = { consent: false } as QuotePayload;
+  const d = { consent: false, smsConsent: false } as QuotePayload;
   for (const key of Object.keys(LIMITS) as TextKey[]) {
     const raw =
       typeof input[key] === "string"
@@ -85,6 +97,8 @@ export function validateQuote(
     d[key] = raw;
   }
   d.consent = input.consent === true || input.consent === "on" || input.consent === "true";
+  d.smsConsent =
+    input.smsConsent === true || input.smsConsent === "on" || input.smsConsent === "true";
 
   if (!d.firstName)
     return { ok: false, error: "Please enter your first name.", field: "firstName" };
@@ -132,6 +146,11 @@ export function formatQuoteEmail(d: QuotePayload, submittedAt: Date): string {
     "",
     "Consent:",
     `Checked at ${submittedAt.toISOString()} — "${QUOTE_CONSENT_TEXT}"`,
+    "",
+    "SMS consent (optional):",
+    d.smsConsent
+      ? `Yes — checked at ${submittedAt.toISOString()} — "${SMS_CONSENT_TEXT}"`
+      : "No — the text message box was not checked.",
     "",
     "—",
     "Reply to this email to respond directly to the sender.",
