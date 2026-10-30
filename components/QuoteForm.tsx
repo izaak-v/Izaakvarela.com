@@ -9,6 +9,7 @@ import {
   QUOTE_CONSENT_TEXT,
   QUOTE_INTERESTS,
   QUOTE_INTEREST_EVENT,
+  SMS_CONSENT_TEXT,
   formatQuoteEmail,
   quoteSubject,
   validateQuote,
@@ -48,10 +49,11 @@ export function QuoteForm({ email, phone }: Props) {
     e.preventDefault();
     if (inFlight.current) return;
     const fd = new FormData(e.currentTarget);
-    const values = { ...Object.fromEntries(fd), consent: fd.get("consent") === "on" } as Record<
-      string,
-      unknown
-    >;
+    const values = {
+      ...Object.fromEntries(fd),
+      consent: fd.get("consent") === "on",
+      smsConsent: fd.get("smsConsent") === "on",
+    } as Record<string, unknown>;
     const result = validateQuote(values);
     if (!result.ok) {
       setStatus({ kind: "error", message: result.error, field: result.field });
@@ -65,7 +67,12 @@ export function QuoteForm({ email, phone }: Props) {
       const res = await fetch("/api/quote", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...result.data, company: String(values.company ?? "") }),
+        body: JSON.stringify({
+          ...result.data,
+          company: String(values.company ?? ""),
+          // Recorded as the SMS consent source (page only — no query string or hash).
+          pageUrl: `${window.location.origin}${window.location.pathname}`,
+        }),
         signal: AbortSignal.timeout(20000),
       });
       const json = (await res.json().catch(() => ({}))) as { error?: string; field?: string };
@@ -289,6 +296,16 @@ export function QuoteForm({ email, phone }: Props) {
         <div className="field field-full consent">
           <input id="q-consent" name="consent" type="checkbox" required {...invalid("consent")} />
           <label htmlFor="q-consent">{QUOTE_CONSENT_TEXT}</label>
+        </div>
+        <div className="field field-full consent">
+          <input id="q-smsConsent" name="smsConsent" type="checkbox" />
+          <div className="consent-copy">
+            <label htmlFor="q-smsConsent">{SMS_CONSENT_TEXT}</label>
+            <p className="consent-links">
+              <a href="/privacy">Privacy Policy</a>
+              <a href="/terms">Terms &amp; Conditions</a>
+            </p>
+          </div>
         </div>
       </div>
 

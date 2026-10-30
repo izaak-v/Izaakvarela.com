@@ -9,7 +9,7 @@ export const metadata = pageMetadata({
   path: "/privacy",
 });
 
-const UPDATED = "October 27, 2026";
+const UPDATED = "October 30, 2026";
 
 export default function Privacy() {
   const site = profile.website.replace(/^https?:\/\//, "");
@@ -32,9 +32,10 @@ export default function Privacy() {
             <strong>Request Coverage form.</strong> If you request coverage, I receive the
             information you enter: first and last name, phone number, email address, state, and, if
             you choose, the type and amount of coverage you&rsquo;re interested in, the best time to
-            reach you, and any notes, along with your consent and the time you gave it. The request
-            is emailed to me through Resend and may be saved in the client-management system I use
-            to keep track of inquiries and follow up with you.
+            reach you, and any notes, along with your consent and the time you gave it, and whether
+            you chose to receive text messages (a separate, optional checkbox). The request is
+            emailed to me through Resend and may be saved in the client-management system I use to
+            keep track of inquiries and follow up with you.
           </li>
           <li>
             <strong>Contact form.</strong> If you use the contact form, I receive the information
@@ -88,13 +89,26 @@ export default function Privacy() {
 
         {profile.smsEnabled ? (
           <>
-            <h2>Text messages</h2>
+            <h2 id="sms">SMS/Text Messaging Privacy</h2>
             <p>
-              If you give me your mobile number and agree to receive text messages, I will use it
-              only to communicate with you about your inquiry, appointments, or policy. Message
-              frequency varies. Message and data rates may apply. Reply STOP to opt out at any time
-              or HELP for help. Mobile phone numbers and text messaging consent are not sold or
-              shared with third parties for their marketing purposes.
+              When you voluntarily opt in to receive text messages from {profile.name}, I may use
+              your mobile phone number to communicate with you regarding your insurance inquiry,
+              requested coverage options, appointment scheduling and reminders, follow-up, and
+              related client service.
+            </p>
+            <p>
+              Message frequency may vary. Message and data rates may apply. You may reply STOP at
+              any time to opt out of future text messages or HELP for assistance.
+            </p>
+            <p>
+              SMS opt-in data and consent information will not be sold, rented, or shared with third
+              parties or affiliates for their marketing or promotional purposes. Information may
+              still be shared with service providers when necessary to operate my communications and
+              provide requested services, subject to appropriate privacy protections.
+            </p>
+            <p>
+              Consent to receive SMS messages is not a condition of purchasing any product or
+              service.
             </p>
           </>
         ) : null}

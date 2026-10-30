@@ -9,7 +9,7 @@ export const metadata = pageMetadata({
   path: "/terms",
 });
 
-const UPDATED = "October 27, 2026";
+const UPDATED = "October 30, 2026";
 
 export default function Terms() {
   const site = profile.website.replace(/^https?:\/\//, "");
@@ -56,6 +56,27 @@ export default function Terms() {
           application for insurance, and does not bind coverage. Please do not send Social Security
           numbers, bank or payment information, or medical information through this website or by
           email.
+        </p>
+
+        <h2 id="sms">SMS Messaging Terms</h2>
+        <p>
+          By voluntarily opting in, you agree to receive recurring text messages from {profile.name}{" "}
+          regarding life insurance inquiries, requested coverage options, appointment scheduling and
+          reminders, follow-up, and related client service.
+        </p>
+        <p>
+          Message frequency varies. Message and data rates may apply. Consent to receive SMS
+          messages is not a condition of purchasing any product or service.
+        </p>
+        <p>
+          You may reply STOP at any time to unsubscribe from SMS communications. After opting out,
+          you will receive no further marketing or informational SMS messages unless you
+          subsequently provide consent again. Reply HELP for assistance or contact {profile.name}{" "}
+          through the contact information provided on this website.
+        </p>
+        <p>
+          Wireless carriers are not liable for delayed or undelivered messages. Your use of SMS
+          communications is also subject to the <Link href="/privacy">Privacy Policy</Link>.
         </p>
 
         <h2>Third-party services and links</h2>

@@ -18,6 +18,7 @@ const visitor = {
   bestTime: "Evening",
   message: "Looking for something simple.",
   consent: true,
+  smsConsent: false,
 };
 
 test.describe("homepage", () => {
