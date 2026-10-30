@@ -63,3 +63,5 @@ npm run test:e2e  # browser tests: mobile menu, contact form, content guards (iP
 
 Vercel → Add New → Project → import this repo (framework preset: Next.js, default settings). Then add
 `izaakvarela.com` and `www.izaakvarela.com` under Project → Settings → Domains.
+
+Deployment refresh (Oct 30, 2026): no-op commit to trigger a fresh Git-based production deploy of `main`.
