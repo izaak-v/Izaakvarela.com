@@ -9,7 +9,7 @@ export const metadata = pageMetadata({
   path: "/terms",
 });
 
-const UPDATED = "October 30, 2026";
+const UPDATED = "November 3, 2026";
 
 export default function Terms() {
   const site = profile.website.replace(/^https?:\/\//, "");
@@ -65,8 +65,9 @@ export default function Terms() {
           reminders, follow-up, and related client service.
         </p>
         <p>
-          Message frequency varies. Message and data rates may apply. Consent to receive SMS
-          messages is not a condition of purchasing any product or service.
+          Message frequency varies. Message and data rates may apply. Text messaging is optional:
+          you can decline it and still request coverage or use any other service. Consent to receive
+          SMS messages is not a condition of purchasing any product or service.
         </p>
         <p>
           You may reply STOP at any time to unsubscribe from SMS communications. After opting out,
