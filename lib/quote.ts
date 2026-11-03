@@ -34,17 +34,21 @@ export const CONTACT_TIMES = ["Morning", "Afternoon", "Evening", "Any time"] as 
 
 /**
  * Shown next to the required consent checkbox, and recorded with each submission. Covers calls and
- * email only: texting has its own optional checkbox (SMS_CONSENT_TEXT), as A2P 10DLC requires.
+ * email only: texting is a separate, optional choice (SMS_CONSENT_TEXT), as A2P 10DLC requires.
  */
 export const QUOTE_CONSENT_TEXT =
   "I agree that Izaak Varela, a licensed life insurance agent, may contact me about my insurance inquiry by phone call and email at the number and email I provided. Consent is not a condition of purchase.";
 
 /**
- * Optional SMS opt-in (A2P 10DLC). Shown verbatim next to its own unchecked checkbox, followed by
- * links to /privacy and /terms, and recorded with the submission. Never required to submit.
+ * Optional SMS opt-in (A2P 10DLC). The form offers two explicit choices: this affirmative one, and
+ * SMS_DECLINE_TEXT, which is selected by default. Shown verbatim, followed by links to /privacy and
+ * /terms, and recorded with the submission when chosen. Never required to submit.
  */
 export const SMS_CONSENT_TEXT =
-  "I agree to receive recurring text messages from Izaak Varela regarding my life insurance inquiry, coverage options, appointment scheduling and reminders, and follow-up. Message frequency varies. Message and data rates may apply. Reply STOP to opt out and HELP for help. Consent is not a condition of purchase.";
+  "Yes, I agree to receive recurring text messages from Izaak Varela regarding my insurance inquiry, coverage options, appointment scheduling and reminders, and follow-up. Message frequency varies. Message and data rates may apply. Reply STOP to opt out or HELP for assistance. Consent is not a condition of purchase.";
+
+/** The explicit "decline texts" choice (default). Requesting coverage works the same either way. */
+export const SMS_DECLINE_TEXT = "No thanks, continue without text messages.";
 
 /** Same rule as ProducerOS: 10 digits (optional leading 1); area code and exchange can't start with 0 or 1. */
 export function isUsPhone(input: string): boolean {
@@ -97,8 +101,12 @@ export function validateQuote(
     d[key] = raw;
   }
   d.consent = input.consent === true || input.consent === "on" || input.consent === "true";
+  // Only an affirmative choice counts; "no", a missing value or anything else is no SMS consent.
   d.smsConsent =
-    input.smsConsent === true || input.smsConsent === "on" || input.smsConsent === "true";
+    input.smsConsent === true ||
+    input.smsConsent === "yes" ||
+    input.smsConsent === "on" ||
+    input.smsConsent === "true";
 
   if (!d.firstName)
     return { ok: false, error: "Please enter your first name.", field: "firstName" };
@@ -149,8 +157,8 @@ export function formatQuoteEmail(d: QuotePayload, submittedAt: Date): string {
     "",
     "SMS consent (optional):",
     d.smsConsent
-      ? `Yes — checked at ${submittedAt.toISOString()} — "${SMS_CONSENT_TEXT}"`
-      : "No — the text message box was not checked.",
+      ? `Yes — chosen at ${submittedAt.toISOString()} — "${SMS_CONSENT_TEXT}"`
+      : `No — "${SMS_DECLINE_TEXT}" (no text message consent).`,
     "",
     "—",
     "Reply to this email to respond directly to the sender.",

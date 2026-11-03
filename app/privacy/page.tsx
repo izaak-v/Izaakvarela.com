@@ -9,7 +9,7 @@ export const metadata = pageMetadata({
   path: "/privacy",
 });
 
-const UPDATED = "October 30, 2026";
+const UPDATED = "November 3, 2026";
 
 export default function Privacy() {
   const site = profile.website.replace(/^https?:\/\//, "");
@@ -33,9 +33,9 @@ export default function Privacy() {
             information you enter: first and last name, phone number, email address, state, and, if
             you choose, the type and amount of coverage you&rsquo;re interested in, the best time to
             reach you, and any notes, along with your consent and the time you gave it, and whether
-            you chose to receive text messages (a separate, optional checkbox). The request is
-            emailed to me through Resend and may be saved in the client-management system I use to
-            keep track of inquiries and follow up with you.
+            you chose to receive text messages (a separate, optional choice). The request is emailed
+            to me through Resend and may be saved in the client-management system I use to keep
+            track of inquiries and follow up with you.
           </li>
           <li>
             <strong>Contact form.</strong> If you use the contact form, I receive the information
@@ -107,8 +107,10 @@ export default function Privacy() {
               provide requested services, subject to appropriate privacy protections.
             </p>
             <p>
-              Consent to receive SMS messages is not a condition of purchasing any product or
-              service.
+              Text messaging is optional. You can request coverage, ask questions, or work with me
+              without agreeing to receive text messages, and the Request Coverage form lets you
+              choose &ldquo;No thanks, continue without text messages.&rdquo; Consent to receive SMS
+              messages is not a condition of purchasing any product or service.
             </p>
           </>
         ) : null}

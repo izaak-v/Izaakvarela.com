@@ -10,6 +10,7 @@ import {
   QUOTE_INTERESTS,
   QUOTE_INTEREST_EVENT,
   SMS_CONSENT_TEXT,
+  SMS_DECLINE_TEXT,
   formatQuoteEmail,
   quoteSubject,
   validateQuote,
@@ -52,7 +53,7 @@ export function QuoteForm({ email, phone }: Props) {
     const values = {
       ...Object.fromEntries(fd),
       consent: fd.get("consent") === "on",
-      smsConsent: fd.get("smsConsent") === "on",
+      smsConsent: fd.get("smsConsent") === "yes",
     } as Record<string, unknown>;
     const result = validateQuote(values);
     if (!result.ok) {
@@ -297,16 +298,26 @@ export function QuoteForm({ email, phone }: Props) {
           <input id="q-consent" name="consent" type="checkbox" required {...invalid("consent")} />
           <label htmlFor="q-consent">{QUOTE_CONSENT_TEXT}</label>
         </div>
-        <div className="field field-full consent">
-          <input id="q-smsConsent" name="smsConsent" type="checkbox" />
-          <div className="consent-copy">
-            <label htmlFor="q-smsConsent">{SMS_CONSENT_TEXT}</label>
-            <p className="consent-links">
-              <a href="/privacy">Privacy Policy</a>
-              <a href="/terms">Terms &amp; Conditions</a>
-            </p>
+        <fieldset className="field field-full sms-choice" aria-describedby="sms-choice-note">
+          <legend>
+            Text messages <span className="optional">(optional)</span>
+          </legend>
+          <p id="sms-choice-note" className="sms-choice-note">
+            Texting is optional. You can request coverage with either choice.
+          </p>
+          <div className="sms-option">
+            <input id="q-sms-no" name="smsConsent" type="radio" value="no" defaultChecked />
+            <label htmlFor="q-sms-no">{SMS_DECLINE_TEXT}</label>
           </div>
-        </div>
+          <div className="sms-option">
+            <input id="q-sms-yes" name="smsConsent" type="radio" value="yes" />
+            <label htmlFor="q-sms-yes">{SMS_CONSENT_TEXT}</label>
+          </div>
+          <p className="consent-links">
+            <a href="/privacy">Privacy Policy</a>
+            <a href="/terms">Terms &amp; Conditions</a>
+          </p>
+        </fieldset>
       </div>
 
       <div className="form-actions">
