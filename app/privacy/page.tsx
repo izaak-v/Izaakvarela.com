@@ -40,8 +40,9 @@ export default function Privacy() {
           <li>
             <strong>Contact form.</strong> If you use the contact form, I receive the information
             you enter: first and last name, email address, and, if you choose, phone number, state,
-            the topic you&rsquo;re interested in, and your message. The submission is delivered to
-            my email inbox through Resend, an email delivery service. (If online delivery is
+            the topic you&rsquo;re interested in, and your message, along with whether you chose to
+            receive text messages (a separate, optional choice). The submission is delivered to my
+            email inbox through Resend, an email delivery service. (If online delivery is
             unavailable, the form instead opens your own email app so you can send it yourself.)
           </li>
           <li>
@@ -108,9 +109,9 @@ export default function Privacy() {
             </p>
             <p>
               Text messaging is optional. You can request coverage, ask questions, or work with me
-              without agreeing to receive text messages, and the Request Coverage form lets you
-              choose &ldquo;No thanks, continue without text messages.&rdquo; Consent to receive SMS
-              messages is not a condition of purchasing any product or service.
+              without agreeing to receive text messages, and the Request Coverage and contact forms
+              let you choose &ldquo;No thanks, continue without text messages.&rdquo; Consent to
+              receive SMS messages is not a condition of purchasing any product or service.
             </p>
           </>
         ) : null}

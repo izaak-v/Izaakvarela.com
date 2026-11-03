@@ -11,6 +11,7 @@ import {
   type ContactPayload,
 } from "@/lib/contact";
 import { Icon } from "./Icon";
+import { SmsChoice } from "./SmsChoice";
 
 type Props = {
   email: string;
@@ -24,15 +25,17 @@ type Status =
   | { kind: "sent" }
   /** Online delivery isn't configured: offer the visitor's email app, pre-filled. */
   | { kind: "fallback"; mailtoHref: string }
-  | { kind: "error"; message: string };
+  | { kind: "error"; message: string; field?: string };
 
-function mailtoFor(email: string, d: ContactPayload): string {
-  return `mailto:${email}?subject=${encodeURIComponent(contactSubject(d))}&body=${encodeURIComponent(formatContactEmail(d))}`;
+function mailtoFor(email: string, d: ContactPayload, pageUrl: string): string {
+  return `mailto:${email}?subject=${encodeURIComponent(contactSubject(d))}&body=${encodeURIComponent(formatContactEmail(d, new Date(), pageUrl))}`;
 }
 
 export function ContactForm({ email, name, phone }: Props) {
   const [status, setStatus] = useState<Status>({ kind: "idle" });
   const inFlight = useRef(false);
+  const formRef = useRef<HTMLFormElement>(null);
+  const phoneInvalid = status.kind === "error" && status.field === "phone";
 
   async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -40,9 +43,13 @@ export function ContactForm({ email, name, phone }: Props) {
     const values = Object.fromEntries(new FormData(e.currentTarget)) as Record<string, string>;
     const result = validateContact(values);
     if (!result.ok) {
-      setStatus({ kind: "error", message: result.error });
+      setStatus({ kind: "error", message: result.error, field: result.field });
+      if (result.field)
+        formRef.current?.querySelector<HTMLElement>(`[name="${result.field}"]`)?.focus();
       return;
     }
+    // Recorded as the SMS consent source (page only — no query string or hash).
+    const pageUrl = `${window.location.origin}${window.location.pathname}`;
 
     inFlight.current = true;
     setStatus({ kind: "sending" });
@@ -50,12 +57,12 @@ export function ContactForm({ email, name, phone }: Props) {
       const res = await fetch("/api/contact", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...result.data, company: values.company ?? "" }),
+        body: JSON.stringify({ ...result.data, company: values.company ?? "", pageUrl }),
         signal: AbortSignal.timeout(20000),
       });
-      const json = (await res.json().catch(() => ({}))) as { error?: string };
+      const json = (await res.json().catch(() => ({}))) as { error?: string; field?: string };
       if (res.status === 503) {
-        setStatus({ kind: "fallback", mailtoHref: mailtoFor(email, result.data) });
+        setStatus({ kind: "fallback", mailtoHref: mailtoFor(email, result.data, pageUrl) });
         return;
       }
       if (!res.ok) {
@@ -63,6 +70,7 @@ export function ContactForm({ email, name, phone }: Props) {
           kind: "error",
           message:
             json.error || `Sorry, your message couldn't be sent. Please email ${email} directly.`,
+          field: json.field,
         });
         return;
       }
@@ -106,7 +114,7 @@ export function ContactForm({ email, name, phone }: Props) {
   }
 
   return (
-    <form className="contact-form" onSubmit={onSubmit} noValidate>
+    <form className="contact-form" ref={formRef} onSubmit={onSubmit} noValidate>
       <div className="form-grid">
         <div className="field">
           <label htmlFor="firstName">First name</label>
@@ -137,7 +145,14 @@ export function ContactForm({ email, name, phone }: Props) {
           <label htmlFor="phone">
             Phone <span className="optional">(optional)</span>
           </label>
-          <input id="phone" name="phone" type="tel" autoComplete="tel" maxLength={30} />
+          <input
+            id="phone"
+            name="phone"
+            type="tel"
+            autoComplete="tel"
+            maxLength={30}
+            {...(phoneInvalid ? { "aria-invalid": true, "aria-describedby": "contact-error" } : {})}
+          />
         </div>
         <div className="field">
           <label htmlFor="state">
@@ -186,6 +201,11 @@ export function ContactForm({ email, name, phone }: Props) {
         apply for or bind any insurance coverage. See the <a href="/privacy">Privacy Policy</a>.
       </p>
 
+      <SmsChoice
+        idPrefix=""
+        note="Texting is optional. You can send your message with either choice."
+      />
+
       <div className="form-actions">
         <button
           className="btn btn-dark"
@@ -198,7 +218,11 @@ export function ContactForm({ email, name, phone }: Props) {
       </div>
 
       <div className={`form-status ${status.kind}`} role="status" aria-live="polite">
-        {status.kind === "error" ? <p role="alert">{status.message}</p> : null}
+        {status.kind === "error" ? (
+          <p role="alert" id="contact-error">
+            {status.message}
+          </p>
+        ) : null}
         {status.kind === "fallback" ? (
           <div className="form-fallback">
             <p>

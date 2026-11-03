@@ -15,6 +15,7 @@ const visitor = {
   state: "Arizona",
   topic: "Final Expense",
   message: "Hello — I have a question about coverage.",
+  smsConsent: false,
 };
 
 const TESTING_SENDERS = /resend\.dev|onboarding@/i;

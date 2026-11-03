@@ -1,5 +1,7 @@
 import { expect, test, type Page } from "@playwright/test";
 import { POST as quotePOST } from "@/app/api/quote/route";
+import { POST as contactPOST } from "@/app/api/contact/route";
+import { validateContact } from "@/lib/contact";
 import { buildQuoteEmail } from "@/lib/contact-email";
 import { consentPageUrl, toInboundLead } from "@/lib/producer-os";
 import { QUOTE_CONSENT_TEXT, SMS_CONSENT_TEXT, SMS_DECLINE_TEXT, validateQuote } from "@/lib/quote";
@@ -321,5 +323,262 @@ test.describe("SMS policy pages", () => {
     await expect(
       page.locator(".prose").getByRole("link", { name: "Privacy Policy" }).first(),
     ).toHaveAttribute("href", "/privacy");
+  });
+});
+
+const FORMS = [
+  {
+    name: "Request Coverage",
+    path: "/#request",
+    prefix: "q-",
+    form: ".quote-form",
+    note: "Texting is optional. You can request coverage with either choice.",
+  },
+  {
+    name: "Contact",
+    path: "/contact",
+    prefix: "",
+    form: ".contact-form",
+    note: "Texting is optional. You can send your message with either choice.",
+  },
+] as const;
+
+for (const f of FORMS) {
+  test.describe(`${f.name} form — shared SMS choice`, () => {
+    const g = (page: Page) => page.locator(f.form).getByRole("group", { name: /Text messages/ });
+
+    test("same two visible choices, decline by default, policy links", async ({ page }) => {
+      await page.goto(f.path);
+      await expect(g(page)).toBeVisible();
+      await expect(g(page)).toHaveAccessibleName("Text messages (optional)");
+      await expect(g(page)).toHaveAccessibleDescription(f.note);
+      await expect(page.locator(`#${f.prefix}sms-no`)).toBeChecked();
+      await expect(page.locator(`#${f.prefix}sms-yes`)).not.toBeChecked();
+      await expect(page.locator(`#${f.prefix}sms-no`)).toHaveAccessibleName(EXACT_DECLINE_TEXT);
+      await expect(page.locator(`#${f.prefix}sms-yes`)).toHaveAccessibleName(EXACT_SMS_TEXT);
+      await expect(g(page).getByRole("link", { name: "Privacy Policy" })).toHaveAttribute(
+        "href",
+        "/privacy",
+      );
+      await expect(g(page).getByRole("link", { name: "Terms & Conditions" })).toHaveAttribute(
+        "href",
+        "/terms",
+      );
+      // Sits directly above the submit button, inside the form, without overflow.
+      // Measured in one frame: /#request smooth-scrolls to the form after load.
+      const { groupBottom, submitTop } = await page.locator(f.form).evaluate((form) => ({
+        groupBottom: form.querySelector(".sms-choice")!.getBoundingClientRect().bottom,
+        submitTop: form.querySelector("button[type=submit]")!.getBoundingClientRect().top,
+      }));
+      expect(groupBottom).toBeLessThanOrEqual(submitTop);
+      const { sw, cw } = await page.evaluate(() => ({
+        sw: document.documentElement.scrollWidth,
+        cw: document.documentElement.clientWidth,
+      }));
+      expect(sw).toBeLessThanOrEqual(cw);
+    });
+
+    test("keyboard selection between the two choices", async ({ page }) => {
+      await page.goto(f.path);
+      await page.locator(`#${f.prefix}sms-no`).focus();
+      await page.keyboard.press("ArrowDown");
+      await expect(page.locator(`#${f.prefix}sms-yes`)).toBeChecked();
+      await page.keyboard.press("ArrowUp");
+      await expect(page.locator(`#${f.prefix}sms-no`)).toBeChecked();
+    });
+  });
+}
+
+test.describe("Contact form — SMS consent", () => {
+  async function fillContact(page: Page, phone = "") {
+    await page.fill("#firstName", "Test");
+    await page.fill("#lastName", "Visitor");
+    await page.fill("#email", "test@example.com");
+    if (phone) await page.fill("#phone", phone);
+    await page.fill("#message", "Hello, I have a question.");
+  }
+  async function captureContact(page: Page) {
+    const bodies: Record<string, unknown>[] = [];
+    await page.route("/api/contact", (r) => {
+      bodies.push(r.request().postDataJSON());
+      return r.fulfill({ json: { ok: true } });
+    });
+    return bodies;
+  }
+  const submit = (page: Page) => page.locator(".contact-form button[type=submit]").click();
+  const sent = (page: Page) =>
+    expect(page.getByText("Thanks — your message has been sent.")).toBeVisible();
+
+  test("both forms use identical consent wording and styling", async ({ page }) => {
+    const read = async (path: string, form: string) => {
+      await page.goto(path);
+      const grp = page.locator(`${form} .sms-choice`);
+      return {
+        labels: await grp.locator("label").allInnerTexts(),
+        legend: await grp.locator("legend").innerText(),
+        links: await grp.locator(".consent-links a").allInnerTexts(),
+        style: await grp.evaluate((el) => {
+          const cs = getComputedStyle(el);
+          return [cs.backgroundColor, cs.borderRadius, cs.padding, cs.fontSize].join("|");
+        }),
+      };
+    };
+    expect(await read("/contact", ".contact-form")).toEqual(await read("/#request", ".quote-form"));
+  });
+
+  test("declining (the default) sends the message with no SMS consent, once", async ({ page }) => {
+    const bodies = await captureContact(page);
+    await page.goto("/contact");
+    await fillContact(page);
+    await submit(page);
+    await sent(page);
+    expect(bodies).toHaveLength(1);
+    expect(bodies[0]).toMatchObject({ smsConsent: false });
+    expect(new URL(String(bodies[0].pageUrl)).pathname).toBe("/contact");
+  });
+
+  test("explicit 'No thanks' with any phone sends the message with no SMS consent", async ({
+    page,
+  }) => {
+    const bodies = await captureContact(page);
+    await page.goto("/contact");
+    await fillContact(page, "(555) 010-0000");
+    await page.locator("#sms-no").check();
+    await submit(page);
+    await sent(page);
+    expect(bodies[0]).toMatchObject({ smsConsent: false, phone: "(555) 010-0000" });
+  });
+
+  test("'Yes' with a valid mobile number records SMS consent", async ({ page }) => {
+    const bodies = await captureContact(page);
+    await page.goto("/contact");
+    await fillContact(page, "(602) 555-0100");
+    await page.locator("#sms-yes").check();
+    await submit(page);
+    await sent(page);
+    expect(bodies[0]).toMatchObject({ smsConsent: true, phone: "(602) 555-0100" });
+    expect(new URL(String(bodies[0].pageUrl)).pathname).toBe("/contact");
+  });
+
+  test("'Yes' without a valid number asks for one; switching to 'No thanks' still sends", async ({
+    page,
+  }) => {
+    const bodies = await captureContact(page);
+    await page.goto("/contact");
+    await fillContact(page);
+    await page.locator("#sms-yes").check();
+    await submit(page);
+    const alert = page.locator(".form-status [role=alert]");
+    await expect(alert).toContainText("valid 10-digit U.S. mobile number");
+    await expect(page.locator("#phone")).toBeFocused();
+    await expect(page.locator("#phone")).toHaveAttribute("aria-invalid", "true");
+    await expect(page.locator("#phone")).toHaveAccessibleDescription(/10-digit U\.S\. mobile/);
+    // An invalid number is refused the same way.
+    await page.fill("#phone", "(555) 010-0000");
+    await submit(page);
+    await expect(alert).toContainText("valid 10-digit U.S. mobile number");
+    expect(bodies).toHaveLength(0);
+    // The submit button stays available; declining sends normally.
+    await expect(page.locator(".contact-form button[type=submit]")).toBeEnabled();
+    await page.locator("label[for=sms-no]").click();
+    await submit(page);
+    await sent(page);
+    expect(bodies).toHaveLength(1);
+    expect(bodies[0]).toMatchObject({ smsConsent: false });
+  });
+
+  test("required fields are unchanged and phone stays optional", async ({ page }) => {
+    await page.goto("/contact");
+    for (const id of ["firstName", "lastName", "email", "message"])
+      expect(await page.locator(`#${id}`).getAttribute("required")).not.toBeNull();
+    expect(await page.locator("#phone").getAttribute("required")).toBeNull();
+    await expect(page.locator("label[for=phone]")).toContainText("(optional)");
+  });
+});
+
+test.describe("Contact form — SMS consent recorded server-side", () => {
+  test.beforeEach(({}, testInfo) => {
+    test.skip(testInfo.project.name !== "desktop", "server-only test runs once");
+  });
+  const contactVisitor = {
+    firstName: "Jane",
+    lastName: "Doe",
+    email: "jane.visitor@example.com",
+    phone: "(602) 555-0100",
+    state: "",
+    topic: "",
+    message: "Hello.",
+  };
+
+  test("validation: consent only with an explicit Yes and a valid number", () => {
+    expect(validateContact({ ...contactVisitor })).toMatchObject({
+      ok: true,
+      data: { smsConsent: false },
+    });
+    expect(validateContact({ ...contactVisitor, smsConsent: "no" })).toMatchObject({
+      ok: true,
+      data: { smsConsent: false },
+    });
+    expect(validateContact({ ...contactVisitor, smsConsent: "yes" })).toMatchObject({
+      ok: true,
+      data: { smsConsent: true },
+    });
+    for (const phone of ["", "(555) 010-0000"])
+      expect(validateContact({ ...contactVisitor, phone, smsConsent: "yes" })).toMatchObject({
+        ok: false,
+        field: "phone",
+      });
+    // A number too short to be any phone is refused by the existing phone check first.
+    expect(validateContact({ ...contactVisitor, phone: "12345", smsConsent: "yes" })).toMatchObject(
+      { ok: false },
+    );
+    // Declining never needs a phone number.
+    expect(validateContact({ ...contactVisitor, phone: "", smsConsent: "no" })).toMatchObject({
+      ok: true,
+    });
+  });
+
+  test("the route emails the SMS choice with timestamp and Contact page source", async () => {
+    const originalFetch = globalThis.fetch;
+    const originalKey = process.env.RESEND_API_KEY;
+    const emails: string[] = [];
+    globalThis.fetch = (async (_url: string, init: RequestInit) => {
+      emails.push(String(JSON.parse(String(init.body)).text));
+      return new Response("{}", { status: 200 });
+    }) as typeof fetch;
+    const post = (extra: Record<string, unknown>) =>
+      contactPOST(
+        new Request(`${SITE}/api/contact`, {
+          method: "POST",
+          headers: {
+            "content-type": "application/json",
+            host: "izaakvarela.com",
+            origin: SITE,
+            "x-forwarded-for": "203.0.113.88",
+          },
+          body: JSON.stringify({ ...contactVisitor, company: "", ...extra }),
+        }),
+      );
+    try {
+      process.env.RESEND_API_KEY = "re_test_key_not_real";
+      expect((await post({ smsConsent: true, pageUrl: `${SITE}/contact` })).status).toBe(200);
+      expect((await post({ smsConsent: false, pageUrl: `${SITE}/contact` })).status).toBe(200);
+      const refused = await post({ smsConsent: true, phone: "" });
+      expect(refused.status).toBe(400);
+      expect(await refused.json()).toMatchObject({ field: "phone" });
+      // A foreign or missing page URL falls back to the Contact page itself.
+      expect((await post({ smsConsent: true, pageUrl: "https://evil.example/" })).status).toBe(200);
+    } finally {
+      globalThis.fetch = originalFetch;
+      if (originalKey === undefined) delete process.env.RESEND_API_KEY;
+      else process.env.RESEND_API_KEY = originalKey;
+    }
+    expect(emails).toHaveLength(3);
+    expect(emails[0]).toMatch(
+      new RegExp(`Yes — chosen at \\d{4}-\\d\\d-\\d\\dT[\\d:.]+Z on ${SITE}/contact — `),
+    );
+    expect(emails[0]).toContain(`"${EXACT_SMS_TEXT}"`);
+    expect(emails[1]).toContain(`No — "${EXACT_DECLINE_TEXT}" (no text message consent).`);
+    expect(emails[2]).toContain(`on ${SITE}/contact — `);
   });
 });

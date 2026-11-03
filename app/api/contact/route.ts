@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { profile } from "@/content/profile";
 import { validateContact } from "@/lib/contact";
 import { buildContactEmail } from "@/lib/contact-email";
+import { consentPageUrl } from "@/lib/producer-os";
 
 /**
  * Contact form handler. Emails each submission to your inbox via Resend (https://resend.com).
@@ -61,14 +62,18 @@ export async function POST(request: Request) {
   }
 
   const result = validateContact(body);
-  if (!result.ok) return NextResponse.json({ error: result.error }, { status: 400 });
+  if (!result.ok)
+    return NextResponse.json({ error: result.error, field: result.field }, { status: 400 });
   const d = result.data;
+  // When and where an SMS opt-in was given: server time, and this site's page (no query/hash).
+  const submittedAt = new Date();
+  const pageUrl = consentPageUrl(body.pageUrl, host, `${profile.website}/contact`);
 
   try {
     const res = await fetch("https://api.resend.com/emails", {
       method: "POST",
       headers: { Authorization: `Bearer ${apiKey}`, "Content-Type": "application/json" },
-      body: JSON.stringify(buildContactEmail(d)),
+      body: JSON.stringify(buildContactEmail(d, submittedAt, pageUrl)),
       signal: AbortSignal.timeout(10000),
     });
     if (!res.ok) {

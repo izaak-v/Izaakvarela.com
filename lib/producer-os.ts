@@ -25,10 +25,13 @@ export function producerOsInboundUrl(): string | null {
 
 /**
  * The page the form was submitted from, for the SMS consent record: the browser-reported URL when it
- * is on this site (query and hash dropped), otherwise the site's home page.
+ * is on this site (query and hash dropped), otherwise `fallback` (the site's home page by default).
  */
-export function consentPageUrl(raw: unknown, host: string | null): string {
-  const fallback = `${profile.website}/`;
+export function consentPageUrl(
+  raw: unknown,
+  host: string | null,
+  fallback = `${profile.website}/`,
+): string {
   if (typeof raw !== "string" || !host) return fallback;
   try {
     const u = new URL(raw);
