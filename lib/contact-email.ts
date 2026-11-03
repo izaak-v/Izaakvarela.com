@@ -9,13 +9,13 @@ export const CONTACT_FROM = "Izaak Varela Website <website@izaakvarela.com>";
 export const CONTACT_TO = profile.email;
 
 /** Resend `POST /emails` payload for a validated contact-form submission. */
-export function buildContactEmail(d: ContactPayload) {
+export function buildContactEmail(d: ContactPayload, submittedAt = new Date(), pageUrl = "") {
   return {
     from: CONTACT_FROM,
     to: [CONTACT_TO],
     reply_to: d.email,
     subject: contactSubject(d),
-    text: formatContactEmail(d),
+    text: formatContactEmail(d, submittedAt, pageUrl),
   };
 }
 

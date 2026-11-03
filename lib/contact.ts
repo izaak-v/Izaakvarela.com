@@ -1,4 +1,5 @@
 import { services } from "@/content/services";
+import { SMS_CONSENT_TEXT, SMS_DECLINE_TEXT, isSmsOptIn, isUsPhone } from "@/lib/sms-consent";
 
 export const US_STATES = [
   "Alabama",
@@ -68,9 +69,13 @@ export type ContactPayload = {
   state: string;
   topic: string;
   message: string;
+  /** Optional SMS opt-in; true only for an explicit "Yes" with a valid U.S. mobile number. */
+  smsConsent: boolean;
 };
 
-const LIMITS: Record<keyof ContactPayload, number> = {
+type TextKey = Exclude<keyof ContactPayload, "smsConsent">;
+
+const LIMITS: Record<TextKey, number> = {
   firstName: 60,
   lastName: 60,
   email: 120,
@@ -80,7 +85,7 @@ const LIMITS: Record<keyof ContactPayload, number> = {
   message: 3000,
 };
 
-const MULTILINE: (keyof ContactPayload)[] = ["message"];
+const MULTILINE: TextKey[] = ["message"];
 
 /** Strip control characters (and line breaks from single-line fields, so they can't alter email headers). */
 export function cleanText(value: string, multiline = false): string {
@@ -90,16 +95,16 @@ export function cleanText(value: string, multiline = false): string {
   return value.replace(/[\u0000-\u001F\u007F]+/g, " ").replace(/\s{2,}/g, " ");
 }
 
-function clean(key: keyof ContactPayload, value: string): string {
+function clean(key: TextKey, value: string): string {
   return cleanText(value, MULTILINE.includes(key));
 }
 
 /** Returns a cleaned payload, or an error message. Used on both client and server. */
 export function validateContact(
   input: Record<string, unknown>,
-): { ok: true; data: ContactPayload } | { ok: false; error: string } {
-  const data = {} as ContactPayload;
-  for (const key of Object.keys(LIMITS) as (keyof ContactPayload)[]) {
+): { ok: true; data: ContactPayload } | { ok: false; error: string; field?: string } {
+  const data = { smsConsent: false } as ContactPayload;
+  for (const key of Object.keys(LIMITS) as TextKey[]) {
     const raw = typeof input[key] === "string" ? clean(key, input[key] as string).trim() : "";
     if (raw.length > LIMITS[key]) return { ok: false, error: `${key} is too long.` };
     data[key] = raw;
@@ -114,6 +119,17 @@ export function validateContact(
   if (data.topic && !TOPICS.includes(data.topic))
     return { ok: false, error: "Please choose a topic." };
   if (!data.message) return { ok: false, error: "Please include a short message." };
+  // Never record SMS permission without a number that can receive texts.
+  if (isSmsOptIn(input.smsConsent)) {
+    if (!isUsPhone(data.phone))
+      return {
+        ok: false,
+        error:
+          "To receive text messages, please enter a valid 10-digit U.S. mobile number, or choose \u201cNo thanks, continue without text messages.\u201d",
+        field: "phone",
+      };
+    data.smsConsent = true;
+  }
   return { ok: true, data };
 }
 
@@ -121,7 +137,15 @@ export function contactSubject(d: ContactPayload): string {
   return `Website Inquiry — ${d.firstName} ${d.lastName}`;
 }
 
-export function formatContactEmail(d: ContactPayload): string {
+/**
+ * The email body. `submittedAt` and `pageUrl` record when and where an SMS opt-in was given (the
+ * form's own page, e.g. https://www.izaakvarela.com/contact).
+ */
+export function formatContactEmail(
+  d: ContactPayload,
+  submittedAt: Date = new Date(),
+  pageUrl = "",
+): string {
   return [
     "New inquiry from izaakvarela.com",
     "",
@@ -134,6 +158,11 @@ export function formatContactEmail(d: ContactPayload): string {
     "",
     "Message:",
     d.message,
+    "",
+    "SMS consent (optional):",
+    d.smsConsent
+      ? `Yes — chosen at ${submittedAt.toISOString()}${pageUrl ? ` on ${pageUrl}` : ""} — "${SMS_CONSENT_TEXT}"`
+      : `No — "${SMS_DECLINE_TEXT}" (no text message consent).`,
     "",
     "—",
     "Reply to this email to respond directly to the sender.",

@@ -9,13 +9,12 @@ import {
   QUOTE_CONSENT_TEXT,
   QUOTE_INTERESTS,
   QUOTE_INTEREST_EVENT,
-  SMS_CONSENT_TEXT,
-  SMS_DECLINE_TEXT,
   formatQuoteEmail,
   quoteSubject,
   validateQuote,
 } from "@/lib/quote";
 import { Icon } from "./Icon";
+import { SmsChoice } from "./SmsChoice";
 
 type Props = { email: string; phone: { display: string; tel: string } | null };
 
@@ -298,26 +297,10 @@ export function QuoteForm({ email, phone }: Props) {
           <input id="q-consent" name="consent" type="checkbox" required {...invalid("consent")} />
           <label htmlFor="q-consent">{QUOTE_CONSENT_TEXT}</label>
         </div>
-        <fieldset className="field field-full sms-choice" aria-describedby="sms-choice-note">
-          <legend>
-            Text messages <span className="optional">(optional)</span>
-          </legend>
-          <p id="sms-choice-note" className="sms-choice-note">
-            Texting is optional. You can request coverage with either choice.
-          </p>
-          <div className="sms-option">
-            <input id="q-sms-no" name="smsConsent" type="radio" value="no" defaultChecked />
-            <label htmlFor="q-sms-no">{SMS_DECLINE_TEXT}</label>
-          </div>
-          <div className="sms-option">
-            <input id="q-sms-yes" name="smsConsent" type="radio" value="yes" />
-            <label htmlFor="q-sms-yes">{SMS_CONSENT_TEXT}</label>
-          </div>
-          <p className="consent-links">
-            <a href="/privacy">Privacy Policy</a>
-            <a href="/terms">Terms &amp; Conditions</a>
-          </p>
-        </fieldset>
+        <SmsChoice
+          idPrefix="q-"
+          note="Texting is optional. You can request coverage with either choice."
+        />
       </div>
 
       <div className="form-actions">

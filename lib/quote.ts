@@ -1,4 +1,5 @@
 import { US_STATES, cleanText } from "@/lib/contact";
+import { SMS_CONSENT_TEXT, SMS_DECLINE_TEXT, isSmsOptIn, isUsPhone } from "@/lib/sms-consent";
 
 /** "Request Coverage" form — shared by the browser form and the /api/quote handler. */
 
@@ -39,24 +40,7 @@ export const CONTACT_TIMES = ["Morning", "Afternoon", "Evening", "Any time"] as 
 export const QUOTE_CONSENT_TEXT =
   "I agree that Izaak Varela, a licensed life insurance agent, may contact me about my insurance inquiry by phone call and email at the number and email I provided. Consent is not a condition of purchase.";
 
-/**
- * Optional SMS opt-in (A2P 10DLC). The form offers two explicit choices: this affirmative one, and
- * SMS_DECLINE_TEXT, which is selected by default. Shown verbatim, followed by links to /privacy and
- * /terms, and recorded with the submission when chosen. Never required to submit.
- */
-export const SMS_CONSENT_TEXT =
-  "Yes, I agree to receive recurring text messages from Izaak Varela regarding my insurance inquiry, coverage options, appointment scheduling and reminders, and follow-up. Message frequency varies. Message and data rates may apply. Reply STOP to opt out or HELP for assistance. Consent is not a condition of purchase.";
-
-/** The explicit "decline texts" choice (default). Requesting coverage works the same either way. */
-export const SMS_DECLINE_TEXT = "No thanks, continue without text messages.";
-
-/** Same rule as ProducerOS: 10 digits (optional leading 1); area code and exchange can't start with 0 or 1. */
-export function isUsPhone(input: string): boolean {
-  if (!/^[0-9()+\-.\s]{10,30}$/.test(input)) return false;
-  let digits = input.replace(/\D/g, "");
-  if (digits.length === 11 && digits.startsWith("1")) digits = digits.slice(1);
-  return digits.length === 10 && !/^[01]/.test(digits) && !/^[01]/.test(digits.slice(3));
-}
+export { SMS_CONSENT_TEXT, SMS_DECLINE_TEXT, isUsPhone } from "@/lib/sms-consent";
 
 export type QuotePayload = {
   firstName: string;
@@ -101,12 +85,7 @@ export function validateQuote(
     d[key] = raw;
   }
   d.consent = input.consent === true || input.consent === "on" || input.consent === "true";
-  // Only an affirmative choice counts; "no", a missing value or anything else is no SMS consent.
-  d.smsConsent =
-    input.smsConsent === true ||
-    input.smsConsent === "yes" ||
-    input.smsConsent === "on" ||
-    input.smsConsent === "true";
+  d.smsConsent = isSmsOptIn(input.smsConsent);
 
   if (!d.firstName)
     return { ok: false, error: "Please enter your first name.", field: "firstName" };
